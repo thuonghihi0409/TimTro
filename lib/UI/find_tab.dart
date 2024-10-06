@@ -14,7 +14,7 @@
 // }
 
 import 'package:flutter/material.dart';
-import 'package:timtro/UI/room_information.dart';
+import 'package:timtro/UI/room_detail_page.dart';
 import 'package:timtro/utils/colors.dart';
 import 'package:timtro/widgets/big_text.dart';
 import 'package:timtro/widgets/small_text.dart';
