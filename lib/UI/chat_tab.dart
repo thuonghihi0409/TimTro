@@ -16,6 +16,7 @@
 
 
 import 'package:flutter/material.dart';
+import 'package:timtro/UI/chat_view_tab.dart';
 import 'package:timtro/utils/colors.dart';
 
 class ChatTab extends StatefulWidget {
@@ -35,6 +36,7 @@ class _ChatTab extends State<ChatTab> {
     return Scaffold(
       appBar: AppBar(
         title: Text('Thông tin của bạn'),
+        backgroundColor: AppColors.mainColor,
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -120,27 +122,33 @@ class _ChatTab extends State<ChatTab> {
                 },
                 activeTrackColor: AppColors.mainColor,
               ),
-              ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: AppColors.mainColor, // Màu nền
-                  foregroundColor: Colors.white, // Màu chữ
-                ),
-                onPressed: () {
-                  if (_formKey.currentState!.validate()) {
-                    // Xử lý khi người dùng nhấn nút "Vào chat ngay"
-                    // Ví dụ: gửi dữ liệu lên server
-                    print('Tên: $_name');
-                    print('Số điện thoại: $_phoneNumber');
-                    print('Giới tính: $_gender');
-                    print('Sinh viên: $_isStudent');
-                  }
+              InkWell(
+                child: ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: AppColors.mainColor, // Màu nền
+                    foregroundColor: Colors.white, // Màu chữ
+                  ),
+                  onPressed: () {
+                    if (_formKey.currentState!.validate()) {
+                      // Xử lý khi người dùng nhấn nút "Vào chat ngay"
+                      // Ví dụ: gửi dữ liệu lên server
+                      print('Tên: $_name');
+                      print('Số điện thoại: $_phoneNumber');
+                      print('Giới tính: $_gender');
+                      print('Sinh viên: $_isStudent');
+                      Navigator.push(context, MaterialPageRoute(builder: (context) => ChatScreen()));
+                    }
 
-                },
-                child: Text('Vào chat ngay',
-                              style: TextStyle(
-                                color: Colors.black
+                  },
+                  child: Text('Vào chat ngay',
+                                style: TextStyle(
+                                  color: Colors.white
+                                ),
                               ),
-                            ),
+                ),
+                // onTap: (){
+                //   Navigator.push(context, MaterialPageRoute(builder: (context) => ChatScreen()));
+                // },
               ),
             ],
 
