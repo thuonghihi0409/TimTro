@@ -4,6 +4,7 @@ import 'package:timtro/UI/account_tab.dart';
 import 'package:timtro/UI/chat_tab.dart';
 import 'package:timtro/UI/find_tab.dart';
 import 'package:timtro/UI/home_tab.dart';
+import 'package:timtro/utils/colors.dart';
 
 class MyApp extends StatelessWidget {
   @override
@@ -38,7 +39,9 @@ class _HomePageState extends State<HomePage> {
     return SafeArea(
         child: CupertinoTabScaffold(
           tabBar: CupertinoTabBar(
-            backgroundColor: Colors.amberAccent,
+            activeColor: AppColors.mainColor,
+            inactiveColor: Colors.grey,
+            // backgroundColor: Colors.amberAccent,
             items: const [
               BottomNavigationBarItem(icon: Icon(Icons.home), label: "Home"),
               BottomNavigationBarItem(
