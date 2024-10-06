@@ -14,6 +14,7 @@
 // }
 
 import 'package:flutter/material.dart';
+import 'package:timtro/UI/room_information.dart';
 import 'package:timtro/utils/colors.dart';
 import 'package:timtro/widgets/big_text.dart';
 import 'package:timtro/widgets/small_text.dart';
@@ -40,6 +41,7 @@ class _FindTabState extends State<FindTab> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+
       body: Column(
         children: [
           Container(
@@ -138,64 +140,75 @@ class _FindTabState extends State<FindTab> {
                           shrinkWrap: true,
                           itemCount: 10,
                           itemBuilder: (context, index) {
-                            return Container(
-                              margin: EdgeInsets.only(left: 20, right: 20,bottom: 10),
-                              child: Row(
-                                children: [
-                                  Container(
-                                    width: 120,
-                                    height: 120,
-                                    decoration: BoxDecoration(
-                                      borderRadius: BorderRadius.circular(20),
-                                      color: Colors.white38,
-                                      image: DecorationImage(
-                                        image: AssetImage("assets/images/anh1.png"),
-                                      ),
-                                    ),
-                                  ),
-                                  Expanded(
-                                    child: Container(
-                                      height: 100,
-                                      width: 200,
-                                      decoration: BoxDecoration(
-                                        borderRadius: BorderRadius.only(
-                                          topRight: Radius.circular(20),
-                                          bottomRight: Radius.circular(20)
-                                        ),
-                                        color: Colors.white,
-                                      ),
-                                      child: Padding(
-                                        padding: EdgeInsets.only(left: 10, right: 10),
-                                        child: Column(
-                                          crossAxisAlignment: CrossAxisAlignment.start,
-                                          mainAxisAlignment: MainAxisAlignment.center,
-                                          children: [
-                                            BigText(text: "Nhà trọ Ngọc Hân"),
-                                            SizedBox(height: 10,),
-                                            SmallText(text: "Dành cho nữ"),
-                                            SizedBox(height: 10,),
-                                            Row(
-                                              //can chinh deu 3 icon
-                                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                              children: [
-                                                IconAndTextWidget(icon: Icons.star,
-                                                  text: "4.5",
-                                                  iconColor: AppColors.inconColor1,),
-                                                IconAndTextWidget(icon: Icons.location_on,
-                                                  text: "1.7km",
-                                                  iconColor: AppColors.mainColor,),
-                                                IconAndTextWidget(icon: Icons.access_time_rounded,
-                                                  text: "32min",
-                                                  iconColor: AppColors.inconColor2,)
-                                              ],
-                                            )
-                                          ],
+                            return InkWell(
+                              child: Container(
+                                margin: EdgeInsets.only(left: 20, right: 20,bottom: 10),
+                                child: Row(
+                                  children: [
+                                       Container(
+                                        width: 120,
+                                        height: 120,
+                                        decoration: BoxDecoration(
+                                          borderRadius: BorderRadius.circular(20),
+                                          color: Colors.white38,
+                                          image: DecorationImage(
+                                            image: AssetImage("assets/images/anh1.png"),
+                                          ),
                                         ),
                                       ),
-                                    ),
-                                  )
-                                ],
+
+
+                                    Expanded(
+                                      child: Container(
+                                        height: 100,
+                                        width: 200,
+                                        decoration: BoxDecoration(
+                                          borderRadius: BorderRadius.only(
+                                            topRight: Radius.circular(20),
+                                            bottomRight: Radius.circular(20)
+                                          ),
+                                          color: Colors.white,
+                                        ),
+                                        child: Padding(
+                                          padding: EdgeInsets.only(left: 10, right: 10),
+                                          child: Column(
+                                            crossAxisAlignment: CrossAxisAlignment.start,
+                                            mainAxisAlignment: MainAxisAlignment.center,
+                                            children: [
+                                              BigText(text: "Nhà trọ Ngọc Hân"),
+                                              SizedBox(height: 10,),
+                                              SmallText(text: "Dành cho nữ"),
+                                              SizedBox(height: 10,),
+                                              Row(
+                                                //can chinh deu 3 icon
+                                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                                children: [
+                                                  IconAndTextWidget(icon: Icons.star,
+                                                    text: "4.5",
+                                                    iconColor: AppColors.inconColor1,),
+                                                  IconAndTextWidget(icon: Icons.location_on,
+                                                    text: "1.7km",
+                                                    iconColor: AppColors.mainColor,),
+                                                  IconAndTextWidget(icon: Icons.access_time_rounded,
+                                                    text: "32min",
+                                                    iconColor: AppColors.inconColor2,)
+                                                ],
+                                              )
+                                            ],
+                                          ),
+                                        ),
+                                      ),
+                                    )
+                                  ],
+                                ),
                               ),
+                              onTap: (){
+                                // Gọi trang mới khi nhấn vào InkWell
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(builder: (context) => RoomDetailPage()),
+                                );
+                              },
                             );
                           },
                         ),
