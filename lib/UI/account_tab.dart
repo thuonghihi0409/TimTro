@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:timtro/Controller/UserController.dart';
 import 'package:timtro/UI/LoginPage.dart';
+import 'package:timtro/UI/UploadImage.dart';
+import 'package:timtro/UI/upRentalpropertyscreen.dart';
 import 'package:timtro/utils/colors.dart';
 import 'RegisterPage.dart';
 
@@ -8,6 +12,7 @@ class AccountTab extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final usercontroler = context.watch<Usercontroller>();
     return Scaffold(
       appBar: AppBar( // Sử dụng AppBar
         backgroundColor: AppColors.mainColor,
@@ -68,6 +73,13 @@ class AccountTab extends StatelessWidget {
                   title: const Text('Về chúng tôi'),
                   onTap: () {
                     _showAboutDialog(context);
+                  },
+                ),
+                ListTile(
+                  leading: Icon(Icons.info_rounded, color: AppColors.mainColor),
+                  title: const Text('Đăng trọ'),
+                  onTap: () {
+                   Navigator.push(context, MaterialPageRoute(builder: (context) => UploadRentalPropertyScreen()));
                   },
                 ),
               ],

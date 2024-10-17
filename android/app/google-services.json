@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "932058865237",
+    "project_id": "timtro-f9635",
+    "storage_bucket": "timtro-f9635.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:932058865237:android:bba1f515b9ad73a87c7edc",
+        "android_client_info": {
+          "package_name": "com.example.timtro"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB9j2f2I7pSGTE1ynJ07HQCRGXdkK5KoGw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

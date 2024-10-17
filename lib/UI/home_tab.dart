@@ -57,37 +57,39 @@ class HomeTab extends StatelessWidget {
     //   ),
     // );
     print("current height: "+MediaQuery.of(context).size.height.toString());
-    return Scaffold(
-      body:  Column(
-        children: [
-          Container(
-
-            child: Container(
-              margin: EdgeInsets.only(top: 10, bottom: 15),
-              padding: EdgeInsets.only(left: 20, right: 20),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-
-                  Center(
-                    child: Container(
-
-                      child: SearchWidget(onSearch: (String ) {  },),
-
-
-                    ),
-                  )
-                ],
+    return SafeArea(
+      child: Scaffold(
+        body:  Column(
+          children: [
+            Container(
+      
+              child: Container(
+                margin: EdgeInsets.only(top: 10, bottom: 15),
+                padding: EdgeInsets.only(left: 20, right: 20),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+      
+                    Center(
+                      child: Container(
+      
+                        child: SearchWidget(onSearch: (String ) {  },),
+      
+      
+                      ),
+                    )
+                  ],
+                ),
               ),
             ),
-          ),
-
-          Expanded( // Wrap HomeTabBody with Expanded for better space management
-            child: SingleChildScrollView(
-              child: HomeTabBody(),
-            ),
-          )
-        ],
+      
+            Expanded( // Wrap HomeTabBody with Expanded for better space management
+              child: SingleChildScrollView(
+                child: HomeTabBody(),
+              ),
+            )
+          ],
+        ),
       ),
     );
   }

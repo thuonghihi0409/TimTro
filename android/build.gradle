@@ -1,3 +1,15 @@
+
+buildscript {
+    repositories {
+        google()
+        mavenCentral()
+    }
+    dependencies {
+        classpath 'com.android.tools.build:gradle:7.4.0' // Đảm bảo bạn có phiên bản mới nhất
+        classpath 'com.google.gms:google-services:4.3.15' // Thêm dòng này
+    }
+}
+
 allprojects {
     repositories {
         google()
@@ -16,3 +28,4 @@ subprojects {
 tasks.register("clean", Delete) {
     delete rootProject.buildDir
 }
+

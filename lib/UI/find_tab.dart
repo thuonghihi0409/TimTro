@@ -13,12 +13,18 @@
 //   }
 // }
 
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:timtro/Controller/RentalPropertyController.dart';
+import 'package:timtro/Model/RentelProperty.dart';
 import 'package:timtro/UI/room_detail_page.dart';
 import 'package:timtro/utils/colors.dart';
 import 'package:timtro/widgets/big_text.dart';
 import 'package:timtro/widgets/small_text.dart';
-
+import 'package:http/http.dart' as http;
+import 'package:timtro/utils/dimensions.dart';
 import '../widgets/icon_and_text_widget.dart';
 import '../widgets/search.dart';
 // import 'package:http/http.dart' as http;
@@ -29,17 +35,11 @@ class FindTab extends StatefulWidget {
 }
 
 class _FindTabState extends State<FindTab> {
-  List<SearchResult> _searchResults = [];
 
-  Future<void> _search(String query) async {
-    // Gọi API tìm kiếm ở đây, ví dụ:
-    var url = Uri.parse('https://api.example.com/search?query=$query');
-    // var response = await http.get(url);
-    // Parse kết quả và cập nhật _searchResults
-  }
 
   @override
   Widget build(BuildContext context) {
+    final rentalpropertycontroller = context.watch<Rentalpropertycontroller>();
     return Scaffold(
 
       body: Column(
@@ -54,7 +54,7 @@ class _FindTabState extends State<FindTab> {
                       child: Container(
                         child: SearchWidget(
                           onSearch: (query) {
-                            _search(query); // Gọi hàm tìm kiếm khi người dùng nhập
+                            rentalpropertycontroller.setRental(); // Gọi hàm tìm kiếm khi người dùng nhập
                           },
 
                         ),
@@ -138,78 +138,10 @@ class _FindTabState extends State<FindTab> {
                         child: ListView.builder(
                           physics: AlwaysScrollableScrollPhysics(),
                           shrinkWrap: true,
-                          itemCount: 10,
+                          itemCount: rentalpropertycontroller.listRental.length, // Số lượng item trong danh sách
                           itemBuilder: (context, index) {
-                            return InkWell(
-                              child: Container(
-                                margin: EdgeInsets.only(left: 20, right: 20,bottom: 10),
-                                child: Row(
-                                  children: [
-                                       Container(
-                                        width: 120,
-                                        height: 120,
-                                        decoration: BoxDecoration(
-                                          borderRadius: BorderRadius.circular(20),
-                                          color: Colors.white38,
-                                          image: DecorationImage(
-                                            image: AssetImage("assets/images/anh1.png"),
-                                          ),
-                                        ),
-                                      ),
-
-
-                                    Expanded(
-                                      child: Container(
-                                        height: 100,
-                                        width: 200,
-                                        decoration: BoxDecoration(
-                                          borderRadius: BorderRadius.only(
-                                            topRight: Radius.circular(20),
-                                            bottomRight: Radius.circular(20)
-                                          ),
-                                          color: Colors.white,
-                                        ),
-                                        child: Padding(
-                                          padding: EdgeInsets.only(left: 10, right: 10),
-                                          child: Column(
-                                            crossAxisAlignment: CrossAxisAlignment.start,
-                                            mainAxisAlignment: MainAxisAlignment.center,
-                                            children: [
-                                              BigText(text: "Nhà trọ Ngọc Hân"),
-                                              SizedBox(height: 10,),
-                                              SmallText(text: "Dành cho nữ"),
-                                              SizedBox(height: 10,),
-                                              Row(
-                                                //can chinh deu 3 icon
-                                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                                children: [
-                                                  IconAndTextWidget(icon: Icons.star,
-                                                    text: "4.5",
-                                                    iconColor: AppColors.inconColor1,),
-                                                  IconAndTextWidget(icon: Icons.location_on,
-                                                    text: "1.7km",
-                                                    iconColor: AppColors.mainColor,),
-                                                  IconAndTextWidget(icon: Icons.access_time_rounded,
-                                                    text: "32min",
-                                                    iconColor: AppColors.inconColor2,)
-                                                ],
-                                              )
-                                            ],
-                                          ),
-                                        ),
-                                      ),
-                                    )
-                                  ],
-                                ),
-                              ),
-                              onTap: (){
-                                // Gọi trang mới khi nhấn vào InkWell
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(builder: (context) => RoomDetailPage()),
-                                );
-                              },
-                            );
+                            final toElement = rentalpropertycontroller.listRental[index]; // Lấy phần tử dựa trên index
+                            return Item(rentalProperty: toElement,); // Trả về widget Item
                           },
                         ),
                       ),
@@ -227,6 +159,89 @@ class _FindTabState extends State<FindTab> {
     );
   }
 }
+
+
+class Item extends StatelessWidget {
+  RentalProperty rentalProperty;
+
+  Item({super.key, required this.rentalProperty});
+
+  @override
+  Widget build(BuildContext context) {
+    return InkWell(
+      child: Container(
+        margin: EdgeInsets.only(left: 20, right: 20,bottom: 10),
+        child: Row(
+          children: [
+            Container(
+              width: 120,
+              height: 120,
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(20),
+                color: Colors.white38,
+                image: DecorationImage(
+                  image: AssetImage("assets/images/anh1.png"),
+                ),
+              ),
+            ),
+
+
+            Expanded(
+              child: Container(
+                height: 100,
+                width: 200,
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.only(
+                      topRight: Radius.circular(20),
+                      bottomRight: Radius.circular(20)
+                  ),
+                  color: Colors.white,
+                ),
+                child: Padding(
+                  padding: EdgeInsets.only(left: 10, right: 10),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      BigText(text: "${rentalProperty.propertyName}"),
+                      SizedBox(height: 10,),
+                      SmallText(text: "Dành cho nữ"),
+                      SizedBox(height: 10,),
+                      Row(
+                        //can chinh deu 3 icon
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          IconAndTextWidget(icon: Icons.star,
+                            text: "4.5",
+                            iconColor: AppColors.inconColor1,),
+                          IconAndTextWidget(icon: Icons.location_on,
+                            text: "1.7km",
+                            iconColor: AppColors.mainColor,),
+                          IconAndTextWidget(icon: Icons.access_time_rounded,
+                            text: "32min",
+                            iconColor: AppColors.inconColor2,)
+                        ],
+                      )
+                    ],
+                  ),
+                ),
+              ),
+            )
+          ],
+        ),
+      ),
+      onTap: (){
+        // Gọi trang mới khi nhấn vào InkWell
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => RoomDetailPage()),
+        );
+      },
+    );
+  }
+}
+
+
 
 class SearchResult {
   final String title;

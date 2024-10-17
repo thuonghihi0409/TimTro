@@ -1,11 +1,13 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:timtro/Controller/UserController.dart';
 import 'package:timtro/UI/account_tab.dart';
 import 'package:timtro/UI/chat_tab.dart';
 import 'package:timtro/UI/find_tab.dart';
 import 'package:timtro/UI/home_tab.dart';
 import 'package:timtro/utils/colors.dart';
-
+import 'package:timtro/UI/info_customer.dart';
 class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
@@ -36,6 +38,8 @@ class _HomePageState extends State<HomePage> {
   ];
   @override
   Widget build(BuildContext context) {
+    final usercontroler = context.watch<Usercontroller>();
+    _tabs[3]= usercontroler.state==0 ? AccountTab() : CustomerInfoPage() ;
     return SafeArea(
         child: CupertinoTabScaffold(
           tabBar: CupertinoTabBar(
