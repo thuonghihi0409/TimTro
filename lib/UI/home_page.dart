@@ -11,6 +11,9 @@ import 'package:timtro/UI/info_customer.dart';
 class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
+    final usercontroler = context.watch<Usercontroller>();
+    usercontroler.loadState();
+
     return MaterialApp(
       home: HomePage(),
       debugShowCheckedModeBanner: false,
@@ -33,13 +36,14 @@ class _HomePageState extends State<HomePage> {
     HomeTab(),
     ChatTab(),
     FindTab(),
-    AccountTab(),
+    AccountTab1(),
 
   ];
   @override
   Widget build(BuildContext context) {
     final usercontroler = context.watch<Usercontroller>();
-    _tabs[3]= usercontroler.state==0 ? AccountTab() : CustomerInfoPage() ;
+    _tabs[1]= usercontroler.state==0 ? ChatTab() : ConversationsScreen() ;
+    _tabs[3]= usercontroler.state==0 ? AccountTab1() : AccountTab2() ;
     return SafeArea(
         child: CupertinoTabScaffold(
           tabBar: CupertinoTabBar(

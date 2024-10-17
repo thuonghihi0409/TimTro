@@ -159,3 +159,72 @@ class _ChatTab extends State<ChatTab> {
     );
   }
 }
+
+
+//=============================
+class Conversation {
+  final String name;
+  final String lastMessage;
+  final String time;
+  final String avatarUrl;
+
+  Conversation({
+    required this.name,
+    required this.lastMessage,
+    required this.time,
+    required this.avatarUrl,
+  });
+}
+
+//======================================
+List<Conversation> conversations = [
+  Conversation(
+    name: "Alice",
+    lastMessage: "See you tomorrow!",
+    time: "10:30 AM",
+    avatarUrl: "https://example.com/avatar1.png",
+  ),
+  Conversation(
+    name: "Bob",
+    lastMessage: "Let's meet at the park.",
+    time: "9:15 AM",
+    avatarUrl: "https://example.com/avatar2.png",
+  ),
+  Conversation(
+    name: "Charlie",
+    lastMessage: "What’s up?",
+    time: "8:00 AM",
+    avatarUrl: "https://example.com/avatar3.png",
+  ),
+];
+
+class ConversationsScreen extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Conversations'),
+      ),
+      body: ListView.builder(
+        itemCount: conversations.length,
+        itemBuilder: (context, index) {
+          final conversation = conversations[index];
+          return ListTile(
+            leading: CircleAvatar(
+              backgroundImage: NetworkImage(conversation.avatarUrl),
+            ),
+            title: Text(
+              conversation.name,
+              style: TextStyle(fontWeight: FontWeight.bold),
+            ),
+            subtitle: Text(conversation.lastMessage),
+            trailing: Text(conversation.time),
+            onTap: () {
+              // Chuyển đến màn hình chat với người này
+            },
+          );
+        },
+      ),
+    );
+  }
+}

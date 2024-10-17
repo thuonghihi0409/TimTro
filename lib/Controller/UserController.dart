@@ -18,12 +18,26 @@ class Usercontroller with ChangeNotifier {
     state=t;
     notifyListeners();
   }
+  Future<void> loadState () async {
+    String? temp = await userservice.getUsername();
+    if (temp!=null){
+      setstate(1);
+    }
+  }
+
+  void logout(){
+    userservice.removeUsername();
+    setstate(0);
+
+  }
+
 
   Future<int> createCustomer(Customer customer) async {
     int t = await userservice.saveCustomerToAPI(customer);
-    if (t == 200) {
-      user = customer;
-    }
+    // if (t == 200) {
+    //   user = customer;
+    // }
+    await userservice.saveUsername(customer.username);
     user = User(
         id: customer.id,
         username: customer.username,
@@ -33,7 +47,8 @@ class Usercontroller with ChangeNotifier {
         gmail: customer.gmail,
         vaitro: customer.vaitro,
         ngaytao: customer.ngaytao);
-    return t;
     notifyListeners();
+    return t;
+
   }
 }
