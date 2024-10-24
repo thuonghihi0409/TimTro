@@ -7,16 +7,19 @@ import 'package:http/http.dart' as http;
 import 'package:timtro/utils/dimensions.dart';
 class Userservice{
 
-  Future<User?> fetchUser(String userId) async {
+  Future<User?> fetchUser(String username) async {
     try {
-      final response = await http.get(Uri.parse('${API.link}/$userId'));
+      final response = await http.get(Uri.parse('${API.link}/users/username=$username'));
 
       if (response.statusCode == 200) {
         final jsonResponse = json.decode(response.body);
+       // print("${jsonResponse}");
+        User user= User.fromJson(jsonResponse);
+       // print("${user.username}");
         return User.fromJson(jsonResponse);
       } else {
         // Xử lý lỗi khi không nhận được phản hồi hợp lệ
-        print('Failed to load user: ${response.statusCode}');
+        print('Failed to load user: $username ${response.statusCode}');
         return null;
       }
     } catch (e) {

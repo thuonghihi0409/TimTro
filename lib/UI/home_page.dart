@@ -11,8 +11,6 @@ import 'package:timtro/UI/info_customer.dart';
 class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    final usercontroler = context.watch<Usercontroller>();
-    usercontroler.loadState();
 
     return MaterialApp(
       home: HomePage(),
@@ -39,6 +37,12 @@ class _HomePageState extends State<HomePage> {
     AccountTab1(),
 
   ];
+  @override
+  void initState() {
+    super.initState();
+    final usercontroller = context.read<Usercontroller>();
+    usercontroller.loadState(); // Gọi loadState một lần khi widget được khởi tạo
+  }
   @override
   Widget build(BuildContext context) {
     final usercontroler = context.watch<Usercontroller>();

@@ -179,11 +179,19 @@ class Item extends StatelessWidget {
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(20),
                 color: Colors.white38,
-                image: DecorationImage(
-                  image: AssetImage("assets/images/anh1.png"),
+              ),
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(20), // Đảm bảo ảnh cũng có góc bo tròn
+                child: Image.network(
+                  '${rentalProperty.image}', // Thay thế bằng URL của ảnh bạn muốn
+                  fit: BoxFit.cover, // Điều chỉnh cách hiển thị ảnh
+                  errorBuilder: (BuildContext context, Object error, StackTrace? stackTrace) {
+                    return Center(child: Text('Error loading image')); // Hiển thị thông báo khi có lỗi
+                  },
                 ),
               ),
             ),
+
 
 
             Expanded(

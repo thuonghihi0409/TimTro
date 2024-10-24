@@ -9,11 +9,12 @@ class Usercontroller with ChangeNotifier {
   int state =0 ;
   Userservice userservice = Userservice();
 
-  void setUser(String id) async {
-    Userservice userservice = Userservice();
-    user = await userservice.fetchUser(id);
-    notifyListeners();
-  }
+  // void setUser(String id) async {
+  //
+  //   user = await userservice.fetchUser(id);
+  //   print("${user!.username} hi");
+  //   notifyListeners();
+  // }
   void setstate(int t){
     state=t;
     notifyListeners();
@@ -21,6 +22,8 @@ class Usercontroller with ChangeNotifier {
   Future<void> loadState () async {
     String? temp = await userservice.getUsername();
     if (temp!=null){
+      userservice.fetchUser(temp);
+      user = await userservice.fetchUser(temp);
       setstate(1);
     }
   }
@@ -28,7 +31,6 @@ class Usercontroller with ChangeNotifier {
   void logout(){
     userservice.removeUsername();
     setstate(0);
-
   }
 
 

@@ -1,4 +1,8 @@
 import 'dart:io';
+import 'package:provider/provider.dart';
+import 'package:timtro/Controller/RentalPropertyController.dart';
+import 'package:timtro/Controller/UserController.dart';
+import 'package:timtro/Model/RentelProperty.dart';
 import 'package:uuid/uuid.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
@@ -6,17 +10,21 @@ import 'package:image_picker/image_picker.dart';
 
 class UploadRentalPropertyScreen extends StatefulWidget {
   @override
-  _UploadRentalPropertyScreenState createState() => _UploadRentalPropertyScreenState();
+  _UploadRentalPropertyScreenState createState() =>
+      _UploadRentalPropertyScreenState();
 }
 
-class _UploadRentalPropertyScreenState extends State<UploadRentalPropertyScreen> {
+class _UploadRentalPropertyScreenState
+    extends State<UploadRentalPropertyScreen> {
   final _formKey = GlobalKey<FormState>();
+  String url = "";
 
   // Các controller để lưu dữ liệu từ người dùng
   TextEditingController _nameController = TextEditingController();
   TextEditingController _addressController = TextEditingController();
   TextEditingController _priceController = TextEditingController();
-  TextEditingController _electricityWaterPriceController = TextEditingController();
+  TextEditingController _electricityWaterPriceController =
+      TextEditingController();
 
   // Biến lưu trữ tiện ích
   bool wifiAvailable = false;
@@ -34,20 +42,22 @@ class _UploadRentalPropertyScreenState extends State<UploadRentalPropertyScreen>
       _imageFile = pickedFile;
     });
   }
+
   Future<void> _uploadImage() async {
     if (_imageFile == null) return;
 
     try {
       // Lấy đường dẫn tham chiếu đến Firebase Storage
       final uuid = Uuid();
-      final storageRef = FirebaseStorage.instance.ref().child("images/${uuid.v4()}");
+      final storageRef =
+          FirebaseStorage.instance.ref().child("images/${uuid.v4()}");
       // Tải lên tệp
-      await storageRef.putFile(_imageFile as File);
+      await storageRef.putFile(File(_imageFile!.path));
 
       // Lấy URL của tệp đã tải lên
-      String downloadURL = await storageRef.getDownloadURL();
+      url = await storageRef.getDownloadURL();
 
-      print('Image uploaded successfully: $downloadURL');
+      print('Image uploaded successfully: $url');
     } catch (e) {
       print('Error uploading image: $e');
     }
@@ -55,6 +65,7 @@ class _UploadRentalPropertyScreenState extends State<UploadRentalPropertyScreen>
 
   @override
   Widget build(BuildContext context) {
+    final usercontroler = context.watch<Usercontroller>();
     return Scaffold(
       appBar: AppBar(
         title: Text('Đăng tin cho thuê trọ'),
@@ -147,11 +158,26 @@ class _UploadRentalPropertyScreenState extends State<UploadRentalPropertyScreen>
                 ),
                 SizedBox(height: 16),
                 ElevatedButton(
-                  onPressed: () {
+                  onPressed: () async {
                     if (_formKey.currentState!.validate()) {
-                      // Lưu dữ liệu khi tất cả các trường hợp lệ
-                      // Thực hiện đăng tin trọ
+                      final rentalcontroller = context.read<Rentalpropertycontroller>();
+                       await _uploadImage();
+                      RentalProperty rentalproperty = new RentalProperty(
+                          propertyId: "hihi",
+                          propertyName: _nameController.text,
+                          address: _addressController.text,
+                          rentPrice: _priceController.text,
+                          description: "mo ta ",
+                          area: 50,
+                          availableRooms: 1,
+                          image: url,
+                          postDate: DateTime.now(),
+                          updateDate: DateTime.now(),
+                          landlordId: usercontroler.user!.id);
+                      print("00000000000000000000000");
+                      rentalcontroller.postRental(rentalproperty);
                     }
+
                   },
                   child: Text('Đăng tin'),
                 ),

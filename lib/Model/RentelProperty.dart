@@ -1,6 +1,7 @@
 import 'package:timtro/Model/Landlork.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_storage/firebase_storage.dart';
+import 'package:timtro/Model/User.dart';
 
 class RentalProperty {
   final Reference storageRef = FirebaseStorage.instance.ref().child("images");
@@ -47,6 +48,7 @@ class RentalProperty {
   }
 
   factory RentalProperty.fromJson(Map<String, dynamic> json) {
+    User user = User.fromJson(json ["landlord"]);
     return RentalProperty(
       propertyId: json['propertyId'] as String,
       propertyName: json['propertyName'] as String,
@@ -58,7 +60,7 @@ class RentalProperty {
       image: json['image'] as String,
       postDate: DateTime.parse(json['postDate'] as String),
       updateDate: DateTime.parse(json['updateDate'] as String),
-      landlordId: json ["landlorkId"] as String,  // Chuyển đổi đối tượng Landlord
+      landlordId: user.id as String,  // Chuyển đổi đối tượng Landlord
     );
   }
 
@@ -75,7 +77,7 @@ class RentalProperty {
       'image': image,
       'postDate': postDate.toIso8601String(),
       'updateDate': updateDate.toIso8601String(),
-      'landlord': landlordId,
+      'landlordId': landlordId,
     };
   }
 }

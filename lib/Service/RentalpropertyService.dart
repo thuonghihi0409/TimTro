@@ -10,7 +10,7 @@ class Rentalpropertyservice {
     try {
       final response = await http.get(Uri.parse("${API.link}/rentalproperty"));
       if (response.statusCode == 200) {
-        print("hihi");
+        print("hihi  ${json.decode(response.body)}");
         // If the server returns a 200 OK response, parse the JSON
         final List<dynamic> jsonResponse = json.decode(response.body);
         return jsonResponse
@@ -27,22 +27,30 @@ class Rentalpropertyservice {
 
   Future<bool> postRentalProperty(RentalProperty property) async {
     try {
-      final url = Uri.parse("${API.link}/rentalproperty");  // Đường dẫn API
+      final url = Uri.parse("${API.link}/rentalproperty");
+      print("${property.toJson()}");
+
       final response = await http.post(
         url,
         headers: {
-          'Content-Type': 'application/json',
+          'Content-Type': 'application/json; charset=UTF-8', // Đảm bảo thêm charset
         },
-        body: jsonEncode(property.toJson()),  // Chuyển dữ liệu tài sản thành JSON
+        body: jsonEncode(property.toJson()),
       );
 
       if (response.statusCode == 201) {
         print('Property posted successfully');
-        return true; // Trả về true nếu đăng tin thành công
+        return true;
+      } else if (response.statusCode == 400) {
+        print('Bad Request: ${response.body}');
+      } else if (response.statusCode == 401) {
+        print('Unauthorized: Please check your credentials');
+      } else if (response.statusCode == 500) {
+        print('Server Error: Please try again later');
       } else {
-        print('Failed to post property: ${response.statusCode}');
-        return false;
+        print('Failed to post property: ${response.statusCode}, ${response.body}');
       }
+      return false;
     } catch (e) {
       print('Error posting property: $e');
       return false;

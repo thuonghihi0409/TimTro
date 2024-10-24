@@ -9,5 +9,9 @@ class Rentalpropertycontroller with ChangeNotifier{
     listRental= await rentalPropertyservice.fetchRentalProperties() as List;
     notifyListeners();
   }
+  void  postRental (RentalProperty rental){
+     rentalPropertyservice.postRentalProperty(rental);
+     notifyListeners();
+  }
 
 }
