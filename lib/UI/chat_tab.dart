@@ -1,21 +1,9 @@
-// import 'package:flutter/material.dart';
-//
-// class ChatTab extends StatelessWidget {
-//   const ChatTab({super.key});
-//
-//   @override
-//   Widget build(BuildContext context) {
-//     return Scaffold(
-//       body: Center(
-//         child: Text("Chat tab"),
-//       ),
-//     );
-//   }
-// }
-
-
 
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:timtro/Controller/ConversationController.dart';
+import 'package:timtro/Controller/MessageController.dart';
+import 'package:timtro/Controller/UserController.dart';
 import 'package:timtro/UI/chat_view_tab.dart';
 import 'package:timtro/utils/colors.dart';
 
@@ -136,7 +124,7 @@ class _ChatTab extends State<ChatTab> {
                       print('Số điện thoại: $_phoneNumber');
                       print('Giới tính: $_gender');
                       print('Sinh viên: $_isStudent');
-                      Navigator.push(context, MaterialPageRoute(builder: (context) => ChatScreen()));
+                     // Navigator.push(context, MaterialPageRoute(builder: (context) => ChatScreen()));
                     }
 
                   },
@@ -160,67 +148,50 @@ class _ChatTab extends State<ChatTab> {
   }
 }
 
-
-//=============================
-class Conversation {
-  final String name;
-  final String lastMessage;
-  final String time;
-  final String avatarUrl;
-
-  Conversation({
-    required this.name,
-    required this.lastMessage,
-    required this.time,
-    required this.avatarUrl,
-  });
+class ConversationsScreen extends StatefulWidget {
+  @override
+  State<ConversationsScreen> createState() => _ConversationsScreenState();
 }
 
-//======================================
-List<Conversation> conversations = [
-  Conversation(
-    name: "Alice",
-    lastMessage: "See you tomorrow!",
-    time: "10:30 AM",
-    avatarUrl: "https://example.com/avatar1.png",
-  ),
-  Conversation(
-    name: "Bob",
-    lastMessage: "Let's meet at the park.",
-    time: "9:15 AM",
-    avatarUrl: "https://example.com/avatar2.png",
-  ),
-  Conversation(
-    name: "Charlie",
-    lastMessage: "What’s up?",
-    time: "8:00 AM",
-    avatarUrl: "https://example.com/avatar3.png",
-  ),
-];
+class _ConversationsScreenState extends State<ConversationsScreen> {
+  @override
+  void initState() {
+    super.initState();
+    final userController = Provider.of<Usercontroller>(context, listen: false);
+    final conversationController = Provider.of<Conversationcontroller>(context, listen: false);
+    conversationController.loadConversation(userController.user!.id);
+  }
 
-class ConversationsScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
+    final userController = context.watch<Usercontroller>();
+    final conversationController = context.watch<Conversationcontroller>();
+
     return Scaffold(
       appBar: AppBar(
         title: Text('Conversations'),
       ),
       body: ListView.builder(
-        itemCount: conversations.length,
+        itemCount: conversationController.conversations.length,
         itemBuilder: (context, index) {
-          final conversation = conversations[index];
+          final conversation = conversationController.conversations[index];
+          final isUser1 = conversation.user1.username == userController.user!.username;
+          final otherUser = isUser1 ? conversation.user2 : conversation.user1;
+          final lastMessage = conversation.lastMessage;
           return ListTile(
             leading: CircleAvatar(
-              backgroundImage: NetworkImage(conversation.avatarUrl),
+              backgroundImage: AssetImage('assets/images/anh3.png'),
+              // Nếu có URL ảnh mạng, bật dòng này:
+              // backgroundImage: imageUrl.isNotEmpty ? NetworkImage(imageUrl) : AssetImage('assets/images/anh3.png'),
             ),
             title: Text(
-              conversation.name,
+              otherUser.name,
               style: TextStyle(fontWeight: FontWeight.bold),
             ),
-            subtitle: Text(conversation.lastMessage),
-            trailing: Text(conversation.time),
+            subtitle: Text(lastMessage?.content ?? "No messages yet"),
+            trailing: Text(lastMessage != null ? lastMessage.timesend.toString() : "No time"),
             onTap: () {
-              // Chuyển đến màn hình chat với người này
+              Navigator.push(context,MaterialPageRoute(builder: (context) => ChatScreen(conversation: conversation,)));
             },
           );
         },

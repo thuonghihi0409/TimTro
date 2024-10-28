@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:timtro/Controller/UserController.dart';
+import 'package:timtro/Model/User.dart';
 
 import 'package:timtro/utils/colors.dart';
 
@@ -10,11 +13,12 @@ class LoginPage extends StatefulWidget {
 
 class _LoginPageState extends State<LoginPage> {
   final _formKey = GlobalKey<FormState>();
-  final TextEditingController _phoneController = TextEditingController();
+  final TextEditingController _usernameController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
+    final usercontroler = context.watch<Usercontroller>();
     return Scaffold(
       appBar: AppBar(
         title: Text('Đăng nhập'),
@@ -37,20 +41,20 @@ class _LoginPageState extends State<LoginPage> {
               ),
               SizedBox(height: 20),
               TextFormField(
-                controller: _phoneController,
+                controller: _usernameController,
                 decoration: InputDecoration(
-                  labelText: 'Số điện thoại',
+                  labelText: 'Username',
                   border: OutlineInputBorder(),
                 ),
-                keyboardType: TextInputType.phone,
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Vui lòng nhập số điện thoại';
-                  } else if (!RegExp(r'^[0-9]{10,11}$').hasMatch(value)) {
-                    return 'Số điện thoại không hợp lệ';
-                  }
-                  return null;
-                },
+                // keyboardType: TextInputType.phone,
+                // validator: (value) {
+                //   if (value == null || value.isEmpty) {
+                //     return 'Vui lòng nhập username';
+                //   } else if (!RegExp(r'^[0-9]{10,11}$').hasMatch(value)) {
+                //     return 'Số điện thoại không hợp lệ';
+                //   }
+                //   return null;
+                // },
               ),
               SizedBox(height: 10),
               TextFormField(
@@ -58,7 +62,8 @@ class _LoginPageState extends State<LoginPage> {
                 decoration: InputDecoration(
                   labelText: 'Mật khẩu',
                   border: OutlineInputBorder(),
-                  suffixIcon: Icon(Icons.visibility_off), // Icon để ẩn hiện mật khẩu
+                  suffixIcon: Icon(
+                      Icons.visibility_off), // Icon để ẩn hiện mật khẩu
                 ),
                 obscureText: true,
                 validator: (value) {
@@ -71,12 +76,16 @@ class _LoginPageState extends State<LoginPage> {
               SizedBox(height: 10),
               ElevatedButton(
                 onPressed: () {
-                  if (_formKey.currentState!.validate()) {
-                    // Kiểm tra dữ liệu hợp lệ và xử lý đăng nhập ở đây
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text('Đang xử lý đăng nhập...')),
-                    );
-                  }
+                  User user = User(id: " ",
+                      username: _usernameController.text,
+                      password: _passwordController.text,
+                      name: " ",
+                      sdt: " ",
+                      gmail: " ",
+                      vaitro: " ",
+                      ngaytao: DateTime.now());
+                  usercontroler.login(user);
+                  Navigator.pop(context);
                 },
                 child: Text('Đăng nhập'),
                 style: ElevatedButton.styleFrom(

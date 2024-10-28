@@ -6,7 +6,8 @@ import 'package:timtro/Service/UserService.dart';
 
 class Usercontroller with ChangeNotifier {
   User? user;
-  int state =0 ;
+  int state = 0;
+
   Userservice userservice = Userservice();
 
   // void setUser(String id) async {
@@ -15,24 +16,24 @@ class Usercontroller with ChangeNotifier {
   //   print("${user!.username} hi");
   //   notifyListeners();
   // }
-  void setstate(int t){
-    state=t;
+  void setstate(int t) {
+    state = t;
     notifyListeners();
   }
-  Future<void> loadState () async {
+
+  Future<void> loadState() async {
     String? temp = await userservice.getUsername();
-    if (temp!=null){
+    if (temp != null) {
       userservice.fetchUser(temp);
       user = await userservice.fetchUser(temp);
       setstate(1);
     }
   }
 
-  void logout(){
+  void logout() {
     userservice.removeUsername();
     setstate(0);
   }
-
 
   Future<int> createCustomer(Customer customer) async {
     int t = await userservice.saveCustomerToAPI(customer);
@@ -51,6 +52,14 @@ class Usercontroller with ChangeNotifier {
         ngaytao: customer.ngaytao);
     notifyListeners();
     return t;
+  }
 
+  Future<void> login(User user1) async {
+    user = await userservice.login(user1);
+
+    if (user != null) {
+      setstate(1);
+      await userservice.saveUsername(user!.username);
+    }
   }
 }

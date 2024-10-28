@@ -1,6 +1,8 @@
 import 'package:firebase_app_check/firebase_app_check.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:timtro/Controller/ConversationController.dart';
+import 'package:timtro/Controller/MessageController.dart';
 import 'package:timtro/Controller/RentalPropertyController.dart';
 import 'package:timtro/Controller/UserController.dart';
 import 'package:timtro/UI/home_page.dart';
@@ -15,6 +17,8 @@ Future<void> main() async {
         providers: [
           ChangeNotifierProvider(create: (_) => Usercontroller()),
           ChangeNotifierProvider(create: (_) => Rentalpropertycontroller()),
+          ChangeNotifierProvider(create: (_) => Conversationcontroller()),
+          ChangeNotifierProvider(create: (_) => Messagecontroller()),
         ],
           child: MyApp()
       )

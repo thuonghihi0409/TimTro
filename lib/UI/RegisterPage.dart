@@ -155,6 +155,7 @@ class _RegisterPageState extends State<RegisterPage> {
                         );
           
                         // Lưu Customer vào API (hàm này bạn sẽ phải tự xây dựng)
+
                         usercontroler.createCustomer(newCustomer);
                         usercontroler.setstate(1);
           

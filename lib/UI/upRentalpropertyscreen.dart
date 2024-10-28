@@ -173,9 +173,10 @@ class _UploadRentalPropertyScreenState
                           image: url,
                           postDate: DateTime.now(),
                           updateDate: DateTime.now(),
-                          landlordId: usercontroler.user!.id);
+                          landlord: usercontroler.user!);
                       print("00000000000000000000000");
                       rentalcontroller.postRental(rentalproperty);
+                      Navigator.pop(context);
                     }
 
                   },

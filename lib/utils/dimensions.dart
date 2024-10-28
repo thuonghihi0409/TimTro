@@ -7,5 +7,6 @@ class Dimensions{
 }
 
 class API {
-  static String link = "https://e4c6-2402-800-63e4-97ec-3547-e7ad-9bca-7738.ngrok-free.app";
+  static String link = "https://c00a-14-164-231-19.ngrok-free.app";
+  static String linksocket ="c00a-14-164-231-19.ngrok-free.app";
 }

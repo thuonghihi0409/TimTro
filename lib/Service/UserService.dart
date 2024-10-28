@@ -28,8 +28,8 @@ class Userservice{
       return null;
     }
   }
-
   Future<int> saveCustomerToAPI(Customer customer) async {
+    //print("${customer.toJson()}");
     // Gọi API để lưu dữ liệu
     final response = await http.post(
       Uri.parse('${API.link}/users'),
@@ -52,5 +52,34 @@ class Userservice{
   Future<void> removeUsername() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     await prefs.remove('username');
+  }
+
+  Future<User?> login(User user) async {
+    try {
+      //print("${user!.toJson()}");
+      final response = await http.post(
+        Uri.parse('${API.link}/users/login'),
+        headers: <String, String>{
+          'Content-Type': 'application/json; charset=UTF-8',
+        },
+        body: jsonEncode(user.toJson()),
+      );
+
+      if (response.statusCode == 200) {
+        final jsonResponse = json.decode(response.body);
+        // print("${jsonResponse}");
+        User user= User.fromJson(jsonResponse);
+        // print("${user.username}");
+        return User.fromJson(jsonResponse);
+      } else {
+        // Xử lý lỗi khi không nhận được phản hồi hợp lệ
+        print('Failed to load user:  ${response.statusCode}');
+        return null;
+      }
+    } catch (e) {
+      // Xử lý lỗi khi có ngoại lệ
+      print('Error occurred: $e');
+      return null;
+    }
   }
 }

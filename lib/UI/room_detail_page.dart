@@ -311,14 +311,21 @@
 //   }
 // }
 
-
-
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:timtro/Controller/ConversationController.dart';
+import 'package:timtro/Controller/UserController.dart';
+import 'package:timtro/Model/Conversation.dart';
+import 'package:timtro/Model/RentelProperty.dart';
+import 'package:timtro/UI/chat_view_tab.dart';
 import '../utils/colors.dart';
 import '../widgets/room_detail_widget.dart';
 
-
 class RoomDetailPage extends StatelessWidget {
+  final RentalProperty rentalProperty;
+
+  const RoomDetailPage({super.key, required this.rentalProperty});
+
   @override
   Widget build(BuildContext context) {
     final List<String> images = [
@@ -346,7 +353,8 @@ class RoomDetailPage extends StatelessWidget {
                 productImages: images,
                 roomName: 'Phòng thường - Lầu 2 - Máy lạnh',
                 price: '4,000,000 VNĐ',
-                address: '87/xx/xx Nguyễn Sỹ Sách, Phường 15, Quận Tân Bình, Thành phố Hồ Chí Minh',
+                address:
+                    '87/xx/xx Nguyễn Sỹ Sách, Phường 15, Quận Tân Bình, Thành phố Hồ Chí Minh',
                 time: 'Tự do',
                 priceTable: priceTable,
               ),
@@ -373,7 +381,30 @@ class RoomDetailPage extends StatelessWidget {
                         backgroundColor: AppColors.mainColor,
                         foregroundColor: Colors.white,
                       ),
-                      onPressed: () {},
+                      onPressed: () async {
+                        final conversationcontroller = Provider.of<Conversationcontroller>(context, listen: false);
+                        final usercontroller = Provider.of<Usercontroller>(context, listen: false);
+
+                        Conversation? conversation = conversationcontroller.conversations.firstWhere(
+                              (conversation) =>
+                          conversation.user2.id == rentalProperty.landlord.id ||
+                              conversation.user1.id == rentalProperty.landlord.id,
+                          orElse: () => Conversation(
+                              conversationId: "",
+                              user1: usercontroller.user!,
+                              user2: rentalProperty.landlord) // Trả về null nếu không tìm thấy
+                        );
+
+                        if (conversation.conversationId == "") {
+                          conversation = Conversation(
+                              conversationId: "hihi",
+                              user1: usercontroller.user!,
+                              user2: rentalProperty.landlord);
+                          print("${conversation.toJson()}");
+                        conversation = await conversationcontroller.newConversation(conversation);
+                        }
+                        Navigator.push(context,MaterialPageRoute(builder: (context) => ChatScreen(conversation: conversation,)));
+                      },
                       child: Text(
                         'Chat\nngay',
                         style: TextStyle(color: Colors.black),

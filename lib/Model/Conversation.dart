@@ -1,10 +1,11 @@
+import 'package:timtro/Model/Message.dart';
 import 'package:timtro/Model/User.dart';
 
 class Conversation {
   String conversationId;
   User user1;
   User user2;
-
+  Message? lastMessage ;
   // Constructor
   Conversation({
     required this.conversationId,
@@ -12,22 +13,21 @@ class Conversation {
     required this.user2,
   });
 
-  // Phương thức để xóa cuộc trò chuyện
-  void deleteConversation() {
-    // Logic để xóa cuộc trò chuyện
-    print("Conversation with ID: $conversationId has been deleted.");
+  // From JSON
+  factory Conversation.fromJson(Map<String, dynamic> json) {
+    return Conversation(
+      conversationId: json['conversationId'],
+      user1: User.fromJson(json['user1']),
+      user2: User.fromJson(json['user2']),
+    );
   }
 
-  // Phương thức để tạo cuộc trò chuyện
-  void createConversation() {
-    // Logic để tạo cuộc trò chuyện
-    print("Conversation created between: ${user1.username} and ${user2.username}");
-  }
-
-  @override
-  String toString() {
-    return 'Conversation{conversationId: $conversationId, user1: ${user1.username}, user2: ${user2.username}}';
+  // To JSON
+  Map<String, dynamic> toJson() {
+    return {
+      'conversationId': conversationId,
+      'user1Id': user1.id,
+      'user2Id': user2.id,
+    };
   }
 }
-
-
