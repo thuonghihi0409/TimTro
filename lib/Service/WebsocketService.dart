@@ -28,8 +28,9 @@ class WebSocketService {
       callback: (frame) {
         if (frame.body != null) {
           // Chuyển frame.body từ JSON sang Message
-          final messageData = jsonDecode(frame.body!);
-          final message = Message.fromJson(messageData);
+          final messageData = frame.body;
+          print("Received message: " + messageData! + " for receiver: " + userId);
+          final message = Message.fromJson(jsonDecode(messageData));
           _messageStreamController.sink.add(message); // Thêm vào stream
         }
       },

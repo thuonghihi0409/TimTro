@@ -8,9 +8,10 @@ class ConversationService {
   Future<List<Conversation>> fetchConversation(String userId) async {
     final url = Uri.parse('${API.link}/conversation/userId=$userId');
     try {
-      final response = await http.get(url);
+      final response = await http.get(url,
+        headers: {'Content-Type': 'application/json; charset=UTF-8'},);
       if (response.statusCode == 200) {
-        final List<dynamic> data = json.decode(response.body);
+        final List<dynamic> data = json.decode(utf8.decode(response.bodyBytes));
         // Chuyển đổi từng phần tử trong danh sách JSON thành đối tượng Conversation
         return data.map((json) => Conversation.fromJson(json)).toList();
       } else {
@@ -30,7 +31,7 @@ class ConversationService {
     try {
       final response = await http.post(
         url,
-        headers: {'Content-Type': 'application/json'},
+        headers: {'Content-Type': 'application/json; charset=UTF-8'},
         body: json.encode(conversation.toJson()),
       );
       if (response.statusCode == 200) {

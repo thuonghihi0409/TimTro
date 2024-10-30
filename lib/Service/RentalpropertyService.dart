@@ -8,11 +8,15 @@ class Rentalpropertyservice {
 
   Future<List<RentalProperty>> fetchRentalProperties() async {
     try {
-      final response = await http.get(Uri.parse("${API.link}/rentalproperty"));
+      final response = await http.get(
+        Uri.parse("${API.link}/rentalproperty"),
+        headers: {
+          'Content-Type': 'application/json; charset=UTF-8',
+        },
+      );
       if (response.statusCode == 200) {
-        print("hihi  ${json.decode(response.body)}");
-        // If the server returns a 200 OK response, parse the JSON
-        final List<dynamic> jsonResponse = json.decode(response.body);
+        print("hihi ${json.decode(utf8.decode(response.bodyBytes))}");
+        final List<dynamic> jsonResponse = json.decode(utf8.decode(response.bodyBytes));
         return jsonResponse
             .map((property) => RentalProperty.fromJson(property))
             .toList();

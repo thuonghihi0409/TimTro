@@ -52,8 +52,9 @@ void initState() {
         user: usercontroller.user!,
       );
       String receiveID= widget.conversation!.user1.id==usercontroller.user!.id ? widget.conversation!.user2.id :widget.conversation!.user1.id;
+      print ("$receiveID");
       mess.newMessage(newMessage);
-      print("${newMessage.toJson()}");
+      print("=============================================================================${newMessage.toJson()}");
       _webSocketService.sendMessage(newMessage, receiveID);
       // Xóa nội dung hộp nhập sau khi gửi
       _controller.clear();

@@ -9,10 +9,11 @@ class Userservice{
 
   Future<User?> fetchUser(String username) async {
     try {
-      final response = await http.get(Uri.parse('${API.link}/users/username=$username'));
+      final response = await http.get(Uri.parse('${API.link}/users/username=$username'),
+        headers: {'Content-Type': 'application/json; charset=UTF-8'},);
 
       if (response.statusCode == 200) {
-        final jsonResponse = json.decode(response.body);
+        final jsonResponse = json.decode(utf8.decode(response.bodyBytes));
        // print("${jsonResponse}");
         User user= User.fromJson(jsonResponse);
        // print("${user.username}");
