@@ -1,20 +1,4 @@
-// import 'package:flutter/material.dart';
-//
-// class FindTab extends StatelessWidget {
-//   const FindTab({super.key});
-//
-//   @override
-//   Widget build(BuildContext context) {
-//     return Scaffold(
-//       body: Center(
-//         child: Text("Find tab"),
-//       ),
-//     );
-//   }
-// }
-
 import 'dart:convert';
-
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:timtro/Controller/RentalPropertyController.dart';
@@ -23,106 +7,66 @@ import 'package:timtro/UI/room_detail_page.dart';
 import 'package:timtro/utils/colors.dart';
 import 'package:timtro/widgets/big_text.dart';
 import 'package:timtro/widgets/small_text.dart';
-import 'package:http/http.dart' as http;
-import 'package:timtro/utils/dimensions.dart';
 import '../widgets/icon_and_text_widget.dart';
 import '../widgets/search.dart';
 
-// import 'package:http/http.dart' as http;
 class FindTab extends StatefulWidget {
   @override
   _FindTabState createState() => _FindTabState();
 }
 
 class _FindTabState extends State<FindTab> {
+  String searchQuery = "";
+
   @override
   void initState() {
     super.initState();
-    final rentalcontroller = context.read<Rentalpropertycontroller>();
-    rentalcontroller
-        .setRental(); // Gọi loadState một lần khi widget được khởi tạo
+    final rentalController = context.read<Rentalpropertycontroller>();
+    rentalController.setRental(); // Gọi loadState một lần khi widget được khởi tạo
   }
 
   @override
   Widget build(BuildContext context) {
     final rentalpropertycontroller = context.watch<Rentalpropertycontroller>();
-    return Scaffold(
-      body: Column(
-        children: [
-          Container(
-              child: Container(
-            child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
-              Center(
-                child: Container(
-                  child: SearchWidget(
-                    onSearch: (query) {
-                      rentalpropertycontroller
-                          .setRental(); // Gọi hàm tìm kiếm khi người dùng nhập
-                    },
-                  ),
-                ),
-              )
-            ]),
-          )),
-          Expanded(
-            child: Container(
-              height: 600,
-              // margin: EdgeInsets.only(top: 10),
-              child: Column(children: [
-                SizedBox(
-                  height: 20,
-                ),
-                Container(
-                  margin: EdgeInsets.only(left: 30, bottom: 10),
-                  child: Row(
-                    crossAxisAlignment: CrossAxisAlignment.end,
-                    children: [
-                      BigText(text: "Phổ biến"),
-                      SizedBox(
-                        width: 10,
-                      ),
-                      Container(
-                        margin: const EdgeInsets.only(bottom: 3),
-                        child: BigText(
-                          text: ".",
-                          color: Colors.black26,
-                        ),
-                      ),
-                      SizedBox(
-                        width: 10,
-                      ),
-                      Container(
-                          padding: EdgeInsets.only(bottom: 5),
-                          child: SmallText(text: "được xem nhiều nhất"))
-                    ],
-                  ),
-                ),
-                Expanded(
-                  child: ListView.builder(
-                    physics: AlwaysScrollableScrollPhysics(),
-                    shrinkWrap: true,
-                    itemCount: rentalpropertycontroller.listRental.length,
-                    // Số lượng item trong danh sách
-                    itemBuilder: (context, index) {
-                      final toElement = rentalpropertycontroller
-                          .listRental[index]; // Lấy phần tử dựa trên index
-                      return Item(
-                        rentalProperty: toElement,
-                      ); // Trả về widget Item
-                    },
-                  ),
-                ),
-              ]),
+    final filteredList = rentalpropertycontroller.listRental
+        .where((property) => property.propertyName
+        .toLowerCase()
+        .contains(searchQuery.toLowerCase()))
+        .toList();
+
+    return SafeArea(
+      child: Scaffold(
+        body: Column(
+          children: [
+            Container(
+              padding: EdgeInsets.all(10),
+              child: SearchWidget(
+                onSearch: (query) {
+                  setState(() {
+                    searchQuery = query; // Cập nhật truy vấn tìm kiếm
+                  });
+                },
+              ),
             ),
-          ),
-        ],
+            Expanded(
+              child: ListView.builder(
+                physics: AlwaysScrollableScrollPhysics(),
+                itemCount: filteredList.length,
+                itemBuilder: (context, index) {
+                  final toElement = filteredList[index]; // Lấy phần tử dựa trên index
+                  return Item(rentalProperty: toElement); // Trả về widget Item
+                },
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
 }
 
 class Item extends StatefulWidget {
-  RentalProperty rentalProperty;
+  final RentalProperty rentalProperty;
 
   Item({super.key, required this.rentalProperty});
 
@@ -147,13 +91,12 @@ class _ItemState extends State<Item> {
               ),
               child: ClipRRect(
                 borderRadius: BorderRadius.circular(20),
-                // Đảm bảo ảnh cũng có góc bo tròn
                 child: widget.rentalProperty.image.isNotEmpty
                     ? Image.network(widget.rentalProperty.image,
-                        fit: BoxFit.cover,
-                        errorBuilder: (context, error, stackTrace) {
-                        return Center(child: Text('Error loading image'));
-                      })
+                    fit: BoxFit.cover,
+                    errorBuilder: (context, error, stackTrace) {
+                      return Center(child: Text('Error loading image'));
+                    })
                     : Center(child: Text('No Image')),
               ),
             ),
@@ -174,15 +117,10 @@ class _ItemState extends State<Item> {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       BigText(text: "${widget.rentalProperty.propertyName}"),
-                      SizedBox(
-                        height: 10,
-                      ),
+                      SizedBox(height: 10),
                       SmallText(text: "Dành cho nữ"),
-                      SizedBox(
-                        height: 10,
-                      ),
+                      SizedBox(height: 10),
                       Row(
-                        //can chinh deu 3 icon
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           IconAndTextWidget(
@@ -211,24 +149,11 @@ class _ItemState extends State<Item> {
         ),
       ),
       onTap: () {
-        // Gọi trang mới khi nhấn vào InkWell
         Navigator.push(
           context,
-          MaterialPageRoute(builder: (context) => RoomDetailPage(rentalProperty: widget.rentalProperty ,)),
+          MaterialPageRoute(builder: (context) => RoomDetailPage(rentalProperty: widget.rentalProperty)),
         );
       },
     );
   }
 }
-
-// class SearchResult {
-//   final String title;
-//   final String description;
-//   final String url;
-//
-//   SearchResult({
-//     required this.title,
-//     required this.description,
-//     required this.url,
-//   });
-// }

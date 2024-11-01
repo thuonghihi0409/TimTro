@@ -1,24 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:timtro/Model/RentelProperty.dart';
 import '../utils/colors.dart';
 
 class RoomDetailWidget extends StatelessWidget {
-  final List<String> productImages;
-  final String roomName;
-  final String price;
-  final String address;
-  final String time;
-  final List<List<String>> priceTable;
+  final RentalProperty rentalProperty;
 
   RoomDetailWidget({
-    required this.productImages,
-    required this.roomName,
-    required this.price,
-    required this.address,
-    required this.time,
-    required this.priceTable,
+    required this.rentalProperty,
   });
-
-
 
   @override
   Widget build(BuildContext context) {
@@ -28,21 +17,24 @@ class RoomDetailWidget extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // Hiển thị hình ảnh sản phẩm
+        // Hiển thị hình ảnh sản phẩm từ URL
         Stack(
           children: [
             Container(
               height: 300,
               child: PageView.builder(
                 controller: _pageController,
-                itemCount: productImages.length,
+                itemCount: 1, // Giả sử bạn chỉ có 1 ảnh cho mỗi phòng
                 onPageChanged: (index) {
                   _currentPage = index;
                 },
                 itemBuilder: (context, index) {
-                  return Image.asset(
-                    productImages[index],
+                  return Image.network(
+                    rentalProperty.image, // URL hình ảnh từ rentalProperty
                     fit: BoxFit.cover,
+                    errorBuilder: (context, error, stackTrace) {
+                      return Center(child: Text('Failed to load image'));
+                    },
                   );
                 },
               ),
@@ -55,12 +47,11 @@ class RoomDetailWidget extends StatelessWidget {
                 padding: EdgeInsets.all(8),
                 color: Colors.black54,
                 child: Text(
-                  '${_currentPage + 1}/${productImages.length}',
+                  '${_currentPage + 1}/1', // Hiện 1 ảnh nên tổng là 1
                   style: TextStyle(color: Colors.white, fontSize: 16),
                 ),
               ),
             ),
-
 
             // Mũi tên sang trái
             Positioned(
@@ -87,7 +78,7 @@ class RoomDetailWidget extends StatelessWidget {
               child: IconButton(
                 icon: Icon(Icons.arrow_forward_ios, color: Colors.white),
                 onPressed: () {
-                  if (_currentPage < productImages.length - 1) {
+                  if (_currentPage < 1 - 1) { // 1 ảnh duy nhất
                     _pageController.nextPage(
                       duration: Duration(milliseconds: 300),
                       curve: Curves.easeInOut,
@@ -99,21 +90,36 @@ class RoomDetailWidget extends StatelessWidget {
           ],
         ),
         SizedBox(height: 16),
-        // Thông tin phòng
+        // Thông tin phòng từ rentalProperty
         Text(
-          roomName,
+          rentalProperty.propertyName,
           style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
         ),
-        Text('Giá: $price', style: TextStyle(fontSize: 18)),
-        Text(address),
-        Text('Thời gian: $time'),
+        Text('Giá: ${rentalProperty.rentPrice}', style: TextStyle(fontSize: 18)),
+        Text(rentalProperty.address),
+        Text('Diện tích: ${rentalProperty.area} m²'),
         SizedBox(height: 20),
-        // Bảng giá
+        // Bảng giá từ thuộc tính riêng của phòng
         Table(
           border: TableBorder.all(),
-          children: priceTable.map((row) {
-            return TableRow(children: row.map((cell) => Text(cell)).toList());
-          }).toList(),
+          children: [
+            TableRow(
+              children: ['Điện', 'Nước', 'Xe', 'Quản lý']
+                  .map((title) => Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Text(title, style: TextStyle(fontWeight: FontWeight.bold)),
+              ))
+                  .toList(),
+            ),
+            TableRow(
+              children: ['3.800/kWh', '80.000/ng', '80.000/xe', '0/ph']
+                  .map((value) => Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Text(value),
+              ))
+                  .toList(),
+            ),
+          ],
         ),
       ],
     );

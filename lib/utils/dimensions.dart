@@ -7,5 +7,5 @@ class Dimensions{
 }
 
 class API {
-  static String link = "https://51a2-14-230-42-208.ngrok-free.app";
+  static String link = "https://969d-14-241-183-210.ngrok-free.app";
 }

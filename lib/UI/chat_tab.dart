@@ -1,9 +1,10 @@
-
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:timtro/Controller/ConversationController.dart';
 import 'package:timtro/Controller/MessageController.dart';
 import 'package:timtro/Controller/UserController.dart';
+import 'package:timtro/Model/Conversation.dart';
 import 'package:timtro/UI/chat_view_tab.dart';
 import 'package:timtro/utils/colors.dart';
 
@@ -33,8 +34,7 @@ class _ChatTab extends State<ChatTab> {
           child: Column(
             children: [
               TextFormField(
-                decoration: InputDecoration(labelText:
-                'Tên của bạn'),
+                decoration: InputDecoration(labelText: 'Tên của bạn'),
                 onChanged: (value) {
                   setState(() {
                     _name = value;
@@ -76,26 +76,24 @@ class _ChatTab extends State<ChatTab> {
                   ),
                   Text('Nam'),
                   Radio(
-                    value: 'Nữ',
-                    groupValue: _gender,
-                    onChanged: (value) {
-                      setState(() {
-                        _gender = value as String;
-                      });
-                    },
-                    activeColor: AppColors.mainColor
-                  ),
+                      value: 'Nữ',
+                      groupValue: _gender,
+                      onChanged: (value) {
+                        setState(() {
+                          _gender = value as String;
+                        });
+                      },
+                      activeColor: AppColors.mainColor),
                   Text('Nữ'),
                   Radio(
-                    value: 'Khác',
-                    groupValue: _gender,
-                    onChanged: (value) {
-                      setState(() {
-                        _gender = value as String;
-                      });
-                    },
-                    activeColor: AppColors.mainColor
-                  ),
+                      value: 'Khác',
+                      groupValue: _gender,
+                      onChanged: (value) {
+                        setState(() {
+                          _gender = value as String;
+                        });
+                      },
+                      activeColor: AppColors.mainColor),
                   Text('Khác'),
                 ],
               ),
@@ -106,7 +104,6 @@ class _ChatTab extends State<ChatTab> {
                   setState(() {
                     _isStudent = value;
                   });
-
                 },
                 activeTrackColor: AppColors.mainColor,
               ),
@@ -124,29 +121,27 @@ class _ChatTab extends State<ChatTab> {
                       print('Số điện thoại: $_phoneNumber');
                       print('Giới tính: $_gender');
                       print('Sinh viên: $_isStudent');
-                     // Navigator.push(context, MaterialPageRoute(builder: (context) => ChatScreen()));
+                      // Navigator.push(context, MaterialPageRoute(builder: (context) => ChatScreen()));
                     }
-
                   },
-                  child: Text('Vào chat ngay',
-                                style: TextStyle(
-                                  color: Colors.white
-                                ),
-                              ),
+                  child: Text(
+                    'Vào chat ngay',
+                    style: TextStyle(color: Colors.white),
+                  ),
                 ),
                 // onTap: (){
                 //   Navigator.push(context, MaterialPageRoute(builder: (context) => ChatScreen()));
                 // },
               ),
             ],
-
           ),
         ),
       ),
-
     );
   }
 }
+
+
 
 class ConversationsScreen extends StatefulWidget {
   @override
@@ -154,12 +149,43 @@ class ConversationsScreen extends StatefulWidget {
 }
 
 class _ConversationsScreenState extends State<ConversationsScreen> {
+  TextEditingController _searchController = TextEditingController();
+  List<Conversation> _filteredConversations = [];
+
   @override
   void initState() {
     super.initState();
     final userController = Provider.of<Usercontroller>(context, listen: false);
-    final conversationController = Provider.of<Conversationcontroller>(context, listen: false);
-    conversationController.loadConversation(userController.user!.id);
+    final conversationController =
+        Provider.of<Conversationcontroller>(context, listen: false);
+
+    conversationController.loadConversation(userController.user!.id).then((_) {
+      setState(() {
+        _filteredConversations = conversationController.conversations;
+      });
+    });
+
+    _searchController.addListener(() {
+      _filterConversations();
+    });
+  }
+
+  void _filterConversations() {
+    final userController = Provider.of<Usercontroller>(context, listen: false);
+    final query = _searchController.text.toLowerCase();
+    final conversationController =
+        Provider.of<Conversationcontroller>(context, listen: false);
+
+    setState(() {
+      _filteredConversations =
+          conversationController.conversations.where((conversation) {
+        final otherUser =
+            conversation.user1.username == userController.user!.username
+                ? conversation.user2
+                : conversation.user1;
+        return otherUser.name.toLowerCase().contains(query);
+      }).toList();
+    });
   }
 
   @override
@@ -167,34 +193,105 @@ class _ConversationsScreenState extends State<ConversationsScreen> {
     final userController = context.watch<Usercontroller>();
     final conversationController = context.watch<Conversationcontroller>();
 
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('Conversations'),
-      ),
-      body: ListView.builder(
-        itemCount: conversationController.conversations.length,
-        itemBuilder: (context, index) {
-          final conversation = conversationController.conversations[index];
-          final isUser1 = conversation.user1.username == userController.user!.username;
-          final otherUser = isUser1 ? conversation.user2 : conversation.user1;
-          final lastMessage = conversation.lastMessage;
-          return ListTile(
-            leading: CircleAvatar(
-              backgroundImage: AssetImage('assets/images/anh3.png'),
-              // Nếu có URL ảnh mạng, bật dòng này:
-              // backgroundImage: imageUrl.isNotEmpty ? NetworkImage(imageUrl) : AssetImage('assets/images/anh3.png'),
+    return SafeArea(
+      child: Scaffold(
+        backgroundColor: Colors.grey[100], // Nền tối nhẹ
+        appBar: AppBar(
+          backgroundColor: Colors.teal[400],
+          elevation: 0,
+          title: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 8.0),
+            child: TextField(
+              controller: _searchController,
+              style: TextStyle(color: Colors.white),
+              decoration: InputDecoration(
+                hintText: 'Tìm kiếm',
+                hintStyle: TextStyle(color: Colors.white70),
+                prefixIcon: Icon(Icons.search, color: Colors.white70),
+                filled: true,
+                fillColor: Colors.teal[300],
+                // Màu nền của ô tìm kiếm
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(10),
+                  borderSide: BorderSide.none,
+                ),
+              ),
             ),
-            title: Text(
-              otherUser.name,
-              style: TextStyle(fontWeight: FontWeight.bold),
+          ),
+          actions: [
+            IconButton(
+              icon: Icon(Icons.qr_code, color: Colors.white),
+              onPressed: () {},
             ),
-            subtitle: Text(lastMessage?.content ?? "No messages yet"),
-            trailing: Text(lastMessage != null ? lastMessage.timesend.toString() : "No time"),
-            onTap: () {
-              Navigator.push(context,MaterialPageRoute(builder: (context) => ChatScreen(conversation: conversation,)));
-            },
-          );
-        },
+            IconButton(
+              icon: Icon(Icons.add, color: Colors.white),
+              onPressed: () {},
+            ),
+          ],
+        ),
+        body: _filteredConversations.isEmpty
+            ? Center(
+                child: Text(
+                  'Không có cuộc trò chuyện nào.',
+                  style: TextStyle(color: Colors.white70, fontSize: 16),
+                ),
+              )
+            : ListView.separated(
+                itemCount: _filteredConversations.length,
+                separatorBuilder: (context, index) =>
+                    Divider(color: Colors.grey[800]),
+                itemBuilder: (context, index) {
+                  final conversation = _filteredConversations[index];
+                  final isUser1 = conversation.user1.username ==
+                      userController.user!.username;
+                  final otherUser =
+                      isUser1 ? conversation.user2 : conversation.user1;
+                  final lastMessage = conversation.lastMessage;
+                  final messageTime = lastMessage != null
+                      ? DateFormat('HH:mm').format(lastMessage.timesend.toLocal())
+                      : "";
+                  final imageUrl = ''; // Thay bằng URL hình ảnh nếu có
+      
+                  return ListTile(
+                    contentPadding:
+                        EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+                    leading: CircleAvatar(
+                      radius: 25,
+                      backgroundImage: imageUrl.isNotEmpty
+                          ? NetworkImage(imageUrl)
+                          : AssetImage('assets/images/anh3.png') as ImageProvider,
+                      backgroundColor:
+                          Colors.grey[700], // Màu nền cho ảnh đại diện
+                    ),
+                    title: Text(
+                      otherUser.name,
+                      style: TextStyle(
+                          color: Colors.black,
+                          fontWeight: FontWeight.w500,
+                          fontSize: 18),
+                    ),
+                    subtitle: Text(
+                      lastMessage?.content ?? "No messages yet",
+                      style: TextStyle(color: Colors.grey[700], fontSize: 14),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    trailing: Text(
+                      messageTime,
+                      style: TextStyle(color: Colors.grey[500], fontSize: 12),
+                    ),
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) =>
+                              ChatScreen(conversation: conversation),
+                        ),
+                      );
+                    },
+                  );
+                },
+              ),
       ),
     );
   }
