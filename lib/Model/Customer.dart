@@ -12,7 +12,7 @@ class Customer extends User {
     required String gmail,
     required String vaitro,
     required DateTime ngaytao,
-
+    required String avturl
   }) : super(
     id: id,
     username: username,
@@ -22,6 +22,7 @@ class Customer extends User {
     gmail: gmail,
     vaitro: "customer",
     ngaytao: ngaytao,
+    avturl: avturl
   );
 
   // Phương thức fromJson cho Customer
@@ -35,7 +36,7 @@ class Customer extends User {
       gmail: json['gmail'] as String,
       vaitro: json['vaitro'] as String,
       ngaytao: DateTime.parse(json['ngaytao'] as String),
-
+      avturl: json['avturl']
     );
   }
 

@@ -32,11 +32,12 @@ class Message {
 
   // Phương thức tạo đối tượng Message từ JSON
   factory Message.fromJson(Map<String, dynamic> json) {
+    print("9999999999999999999999999999999999999999999999999" + DateTime.parse(json['timesend']).toUtc().toString());
     return Message(
       messageId: json['messageId'],
       content: json['content'],
       messageStatus: json['messageStatus'],
-      timesend: DateTime.parse(json['timesend']),
+      timesend: DateTime.parse(json['timesend']).toUtc(),
       conversation: Conversation.fromJson(json['conversation']),
       user: User.fromJson(json['user']),
     );

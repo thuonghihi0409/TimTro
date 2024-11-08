@@ -21,7 +21,6 @@ class WebSocketService {
     );
     stompClient!.activate();
   }
-
   void onConnect(StompFrame frame, String userId) {
     stompClient!.subscribe(
       destination: '/topic/user/${userId}',
@@ -36,9 +35,8 @@ class WebSocketService {
       },
     );
   }
-
   void sendMessage(Message message, String userId) {
-    stompClient!.send(
+    return stompClient!.send(
       destination: '/app/chat.sendMessage/${userId}',
       body: jsonEncode(message.toJson()), // Chuyển sang JSON để gửi
     );

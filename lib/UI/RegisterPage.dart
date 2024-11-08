@@ -151,6 +151,7 @@ class _RegisterPageState extends State<RegisterPage> {
                           gmail: _emailController.text!= null ? _emailController.text :'',  // Bổ sung nếu có trường email
                           vaitro:"customer", // Giả định vai trò là "customer"
                           ngaytao: DateTime.now(),
+                          avturl: " "
           
                         );
           

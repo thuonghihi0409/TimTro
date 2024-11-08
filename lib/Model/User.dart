@@ -10,7 +10,7 @@ class User {
   String gmail;
   String vaitro;
   DateTime ngaytao;
-
+  String avturl;
   User({
     required this.id,
     required this.username,
@@ -20,6 +20,7 @@ class User {
     required this.gmail,
     required this.vaitro,
     required this.ngaytao,
+    required this.avturl
   });
 
   factory User.fromJson(Map<String, dynamic> json) {
@@ -32,6 +33,7 @@ class User {
       gmail: json['gmail'] as String,
       vaitro: json['vaitro'] as String,
       ngaytao: DateTime.parse(json['ngaytao'] as String),
+      avturl: json ['avturl']==null ? "" : json ['avturl'] ,
     );
   }
 
@@ -46,6 +48,7 @@ class User {
       'gmail': gmail,
       'vaitro': vaitro,
       'ngaytao': ngaytao.toIso8601String(),
+      'avturl': avturl
     };
   }
 

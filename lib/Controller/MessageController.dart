@@ -12,12 +12,12 @@ class Messagecontroller with ChangeNotifier {
   Future<void> loadMessage (String conversationId) async {
     messages = await messageservice.fetchMessage(conversationId);
 
-    messages.sort((a, b) => a.timesend.compareTo(b.timesend));
+    messages.sort((a, b) => b.timesend.compareTo(a.timesend));
     updateUI();
   }
   Future<void> newMessage (Message message) async {
     Message? mess=await messageservice.sendMessage(message);
-    if(mess!=null)  messages.add(mess!);
+    if(mess!=null)  messages.insert(0,mess!);
    updateUI();
   }
 

@@ -49,7 +49,9 @@ class Usercontroller with ChangeNotifier {
         sdt: customer.sdt,
         gmail: customer.gmail,
         vaitro: customer.vaitro,
-        ngaytao: customer.ngaytao);
+        ngaytao: customer.ngaytao,
+        avturl: " ",
+    );
     notifyListeners();
     return t;
   }

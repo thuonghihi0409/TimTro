@@ -84,7 +84,9 @@ class _LoginPageState extends State<LoginPage> {
                         sdt: " ",
                         gmail: " ",
                         vaitro: " ",
-                        ngaytao: DateTime.now());
+                        ngaytao: DateTime.now(),
+                        avturl: " "
+                    );
                     usercontroler.login(user);
                     Navigator.pop(context);
                   },

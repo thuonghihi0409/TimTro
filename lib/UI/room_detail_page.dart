@@ -4,6 +4,7 @@ import 'package:timtro/Controller/ConversationController.dart';
 import 'package:timtro/Controller/UserController.dart';
 import 'package:timtro/Model/Conversation.dart';
 import 'package:timtro/Model/RentelProperty.dart';
+import 'package:timtro/UI/MapScreen.dart';
 import 'package:timtro/UI/chat_view_tab.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../utils/colors.dart';
@@ -28,17 +29,15 @@ class RoomDetailPage extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Sử dụng thông tin từ `rentalProperty`
                 RoomDetailWidget(rentalProperty: rentalProperty),
                 SizedBox(height: 20),
-                // Các thông tin chi tiết
                 Text(
                   'Mô tả:',
                   style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                 ),
                 SizedBox(height: 5),
                 Text(
-                  rentalProperty.description, // Giả sử bạn đã thêm mô tả trong model
+                  rentalProperty.description,
                   style: TextStyle(fontSize: 16),
                 ),
                 SizedBox(height: 20),
@@ -49,32 +48,34 @@ class RoomDetailPage extends StatelessWidget {
                     mainAxisAlignment: MainAxisAlignment.spaceAround,
                     children: [
                       ActionButton(
-                        label: 'Đặt lịch\nxem phòng',
-                        onPressed: () {},
                         icon: Icons.calendar_today,
+                        onPressed: () {},
                       ),
                       ActionButton(
-                        label: 'Chat\nngay',
+                        icon: Icons.chat,
                         onPressed: () async {
                           final conversationController =
-                          Provider.of<Conversationcontroller>(context, listen: false);
-                          final userController =
-                          Provider.of<Usercontroller>(context, listen: false);
+                              Provider.of<Conversationcontroller>(context,
+                                  listen: false);
+                          final userController = Provider.of<Usercontroller>(
+                              context,
+                              listen: false);
 
-                          // Kiểm tra xem đã có hội thoại chưa, nếu chưa thì tạo mới
-                          Conversation? conversation = conversationController.conversations.firstWhere(
+                          Conversation? conversation =
+                              conversationController.conversations.firstWhere(
                                   (conv) =>
-                              conv.user2.id == rentalProperty.landlord.id ||
-                                  conv.user1.id == rentalProperty.landlord.id,
-                              orElse: () => Conversation(
-                                  conversationId: "",
-                                  user1: userController.user!,
-                                  user2: rentalProperty.landlord));
+                                      conv.user2.id ==
+                                          rentalProperty.landlord.id ||
+                                      conv.user1.id ==
+                                          rentalProperty.landlord.id,
+                                  orElse: () => Conversation(
+                                      conversationId: "",
+                                      user1: userController.user!,
+                                      user2: rentalProperty.landlord));
 
-                          // Nếu không tồn tại conversationId, tạo mới
                           if (conversation.conversationId == "") {
-                            conversation = await conversationController.newConversation(
-                                Conversation(
+                            conversation = await conversationController
+                                .newConversation(Conversation(
                                     conversationId: "",
                                     user1: userController.user!,
                                     user2: rentalProperty.landlord));
@@ -82,16 +83,19 @@ class RoomDetailPage extends StatelessWidget {
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                              builder: (context) => ChatScreen(conversation: conversation),
+                              builder: (context) => ChatScreen(
+                                conversation: conversation,
+                                conversationController: conversationController,
+                              ),
                             ),
                           );
                         },
-                        icon: Icons.chat,
                       ),
                       ActionButton(
-                        label: 'Gọi điện',
+                        icon: Icons.phone,
                         onPressed: () async {
-                          final Uri phoneUri = Uri(scheme: 'tel', path: rentalProperty.landlord.sdt);
+                          final Uri phoneUri = Uri(
+                              scheme: 'tel', path: rentalProperty.landlord.sdt);
 
                           if (await canLaunchUrl(phoneUri)) {
                             await launchUrl(phoneUri);
@@ -99,7 +103,27 @@ class RoomDetailPage extends StatelessWidget {
                             print('Could not launch $phoneUri');
                           }
                         },
-                        icon: Icons.phone,
+                      ),
+                      // Nút mở Google Maps
+                      ActionButton(
+                        icon: Icons.map,
+                        onPressed: () async {
+                          // final Uri mapUri = Uri(
+                          //   scheme: 'https',
+                          //   host: 'www.google.com',
+                          //   path: 'maps/search/?api=1&query=${rentalProperty.rentPrice},${rentalProperty.area}',
+                          // );
+                          //
+                          // if (await canLaunchUrl(mapUri)) {
+                          //   await launchUrl(mapUri);
+                          // } else {
+                          //   print('Could not launch $mapUri');
+                          //}
+                          Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => RentalMapScreen()));
+                        },
                       ),
                     ],
                   ),
@@ -114,13 +138,11 @@ class RoomDetailPage extends StatelessWidget {
 }
 
 class ActionButton extends StatelessWidget {
-  final String label;
   final IconData icon;
   final VoidCallback onPressed;
 
   const ActionButton({
     super.key,
-    required this.label,
     required this.icon,
     required this.onPressed,
   });
@@ -133,14 +155,7 @@ class ActionButton extends StatelessWidget {
         foregroundColor: Colors.white,
       ),
       onPressed: onPressed,
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(icon),
-          SizedBox(height: 5),
-          Text(label, textAlign: TextAlign.center),
-        ],
-      ),
+      child: Icon(icon),
     );
   }
 }

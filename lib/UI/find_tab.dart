@@ -9,6 +9,7 @@ import 'package:timtro/widgets/big_text.dart';
 import 'package:timtro/widgets/small_text.dart';
 import '../widgets/icon_and_text_widget.dart';
 import '../widgets/search.dart';
+import 'package:intl/intl.dart';  // Thêm dòng này
 
 class FindTab extends StatefulWidget {
   @override
@@ -65,6 +66,8 @@ class _FindTabState extends State<FindTab> {
   }
 }
 
+
+
 class Item extends StatefulWidget {
   final RentalProperty rentalProperty;
 
@@ -77,6 +80,14 @@ class Item extends StatefulWidget {
 class _ItemState extends State<Item> {
   @override
   Widget build(BuildContext context) {
+    // Khởi tạo NumberFormat với định dạng cho tiền tệ
+    final formatter = NumberFormat('#,##0'); // Định dạng giá với dấu phân cách ngàn
+
+    // Chuyển đổi rentPrice sang kiểu num nếu cần
+    final rentPrice = widget.rentalProperty.rentPrice is String
+        ? int.tryParse(widget.rentalProperty.rentPrice) ?? 0
+        : widget.rentalProperty.rentPrice;
+
     return InkWell(
       child: Container(
         margin: EdgeInsets.only(left: 20, right: 20, bottom: 10),
@@ -102,8 +113,7 @@ class _ItemState extends State<Item> {
             ),
             Expanded(
               child: Container(
-                height: 100,
-                width: 200,
+                height: 120,
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.only(
                       topRight: Radius.circular(20),
@@ -117,8 +127,12 @@ class _ItemState extends State<Item> {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       BigText(text: "${widget.rentalProperty.propertyName}"),
-                      SizedBox(height: 10),
-                      SmallText(text: "Dành cho nữ"),
+                      SizedBox(height: 5),
+                      SmallText(text: "Giá: ${formatter.format(rentPrice)} VNĐ"), // Sử dụng formatter
+                      SizedBox(height: 5),
+                      SmallText(text: "Số phòng còn: ${widget.rentalProperty.availableRooms}"),
+                      SizedBox(height: 5),
+                      SmallText(text: "Ngày đăng: ${widget.rentalProperty.postDate.toLocal().toString().split(' ')[0]}"),
                       SizedBox(height: 10),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,

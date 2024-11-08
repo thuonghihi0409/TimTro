@@ -141,8 +141,6 @@ class _ChatTab extends State<ChatTab> {
   }
 }
 
-
-
 class ConversationsScreen extends StatefulWidget {
   @override
   State<ConversationsScreen> createState() => _ConversationsScreenState();
@@ -191,7 +189,7 @@ class _ConversationsScreenState extends State<ConversationsScreen> {
   @override
   Widget build(BuildContext context) {
     final userController = context.watch<Usercontroller>();
-    final conversationController = context.watch<Conversationcontroller>();
+    final conversationController1 = context.watch<Conversationcontroller>();
 
     return SafeArea(
       child: Scaffold(
@@ -248,10 +246,11 @@ class _ConversationsScreenState extends State<ConversationsScreen> {
                       isUser1 ? conversation.user2 : conversation.user1;
                   final lastMessage = conversation.lastMessage;
                   final messageTime = lastMessage != null
-                      ? DateFormat('HH:mm').format(lastMessage.timesend.toLocal())
+                      ? DateFormat('HH:mm')
+                          .format(lastMessage.timesend)
                       : "";
                   final imageUrl = ''; // Thay bằng URL hình ảnh nếu có
-      
+
                   return ListTile(
                     contentPadding:
                         EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
@@ -259,7 +258,8 @@ class _ConversationsScreenState extends State<ConversationsScreen> {
                       radius: 25,
                       backgroundImage: imageUrl.isNotEmpty
                           ? NetworkImage(imageUrl)
-                          : AssetImage('assets/images/anh3.png') as ImageProvider,
+                          : AssetImage('assets/images/anh3.png')
+                              as ImageProvider,
                       backgroundColor:
                           Colors.grey[700], // Màu nền cho ảnh đại diện
                     ),
@@ -284,8 +284,10 @@ class _ConversationsScreenState extends State<ConversationsScreen> {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) =>
-                              ChatScreen(conversation: conversation),
+                          builder: (context) => ChatScreen(
+                            conversation: conversation,
+                            conversationController: conversationController1,
+                          ),
                         ),
                       );
                     },

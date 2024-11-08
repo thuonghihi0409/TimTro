@@ -14,6 +14,7 @@ class Landlord extends User {
     required String gmail,
     required String vaitro,
     required DateTime ngaytao,
+    required String avturl
   }) : super(
           id: id,
           username: username,
@@ -23,6 +24,7 @@ class Landlord extends User {
           gmail: gmail,
           vaitro: "landlork",
           ngaytao: ngaytao,
+          avturl: avturl
         );
 
   factory Landlord.fromJson(Map<String, dynamic> json) {
@@ -35,6 +37,7 @@ class Landlord extends User {
       gmail: json['gmail'] as String,
       vaitro: json['vaitro'] as String,
       ngaytao: DateTime.parse(json['ngaytao'] as String),
+      avturl: json['avturl']
     );
   }
 
@@ -49,6 +52,7 @@ class Landlord extends User {
       'gmail': gmail,
       'vaitro': vaitro,
       'ngaytao': ngaytao.toIso8601String(),
+      'avturl' : avturl
     };
   }
 

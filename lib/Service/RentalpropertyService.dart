@@ -29,6 +29,31 @@ class Rentalpropertyservice {
     }
   }
 
+
+  Future <List <RentalProperty>> getRentalByLandLord(String id) async {
+    try {
+      final response = await http.get(
+        Uri.parse("${API.link}/rentalproperty/landlord=${id}"),
+        headers: {
+          'Content-Type': 'application/json; charset=UTF-8',
+        },
+      );
+      if (response.statusCode == 200) {
+        print("hihi ${json.decode(utf8.decode(response.bodyBytes))}");
+        final List<dynamic> jsonResponse = json.decode(utf8.decode(response.bodyBytes));
+        return jsonResponse
+            .map((property) => RentalProperty.fromJson(property))
+            .toList();
+      } else {
+        throw Exception('Failed to load rental properties');
+      }
+    } catch (e) {
+      print('Error fetching rental properties: $e');
+      return [];
+    }
+  }
+
+
   Future<bool> postRentalProperty(RentalProperty property) async {
     try {
       final url = Uri.parse("${API.link}/rentalproperty");

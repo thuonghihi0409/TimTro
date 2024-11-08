@@ -11,15 +11,14 @@ import 'package:timtro/Service/WebsocketService.dart';
 
 class ChatScreen extends StatefulWidget {
   final Conversation? conversation;
-
-  ChatScreen({super.key, required this.conversation});
+  final Conversationcontroller conversationController ;
+  ChatScreen({super.key, required this.conversation, required this.conversationController});
 
   @override
   _ChatScreenState createState() => _ChatScreenState();
 }
 
 class _ChatScreenState extends State<ChatScreen> {
-  late final Conversationcontroller conversationController;
   final TextEditingController _controller = TextEditingController();
   final FocusNode _focusNode = FocusNode();
   final ScrollController _scrollController = ScrollController();
@@ -28,24 +27,19 @@ class _ChatScreenState extends State<ChatScreen> {
   @override
   void initState() {
     super.initState();
-    conversationController = Provider.of<Conversationcontroller>(context, listen: false);
     final messcontroller = Provider.of<Messagecontroller>(context, listen: false);
     final usercontroller = Provider.of<Usercontroller>(context, listen: false);
 
-    messcontroller.loadMessage(widget.conversation!.conversationId).then((_) {
-      _scrollToBottom();
-    });
+    messcontroller.loadMessage(widget.conversation!.conversationId);
 
     _webSocketService.connect(usercontroller.user!.id);
-
     // Lắng nghe tin nhắn mới từ WebSocket
     _webSocketService.messageStream.listen((Message message) {
       messcontroller.messages.add(message);
       messcontroller.updateUI(); // Thêm tin nhắn vào danh sách
-      _scrollToBottom();
       widget.conversation!.lastMessage = message;
-      conversationController.updateLastMessage(widget.conversation!.conversationId, message); // Cập nhật hội thoại
-      conversationController.sortConversationsByLastMessage(); // Sắp xếp hội thoại khi nhận tin nhắn mới
+      widget.conversationController.updateLastMessage(widget.conversation!.conversationId, message); // Cập nhật hội thoại
+      widget.conversationController.sortConversationsByLastMessage(); // Sắp xếp hội thoại khi nhận tin nhắn mới
     });
   }
 
@@ -69,9 +63,9 @@ class _ChatScreenState extends State<ChatScreen> {
 
       mess.newMessage(newMessage);
       _webSocketService.sendMessage(newMessage, receiveID);
-      conversationController.updateLastMessage(widget.conversation!.conversationId, newMessage); // Cập nhật hội thoại
+      widget.conversationController.updateLastMessage(widget.conversation!.conversationId, newMessage); // Cập nhật hội thoại
       _controller.clear();
-      _scrollToBottom();
+     // _scrollToBottom();
     }
   }
 
@@ -116,6 +110,7 @@ class _ChatScreenState extends State<ChatScreen> {
               child: Container(
                 color: Colors.grey[200],
                 child: ListView.builder(
+                  reverse: true,
                   controller: _scrollController,
                   itemCount: mescontroler.messages.length,
                   itemBuilder: (context, index) {
@@ -138,7 +133,7 @@ class _ChatScreenState extends State<ChatScreen> {
                               Text(message.content, style: TextStyle(fontSize: 16)),
                               SizedBox(height: 5),
                               Text(
-                                DateFormat.Hm().format(message.timesend.toLocal()),
+                                DateFormat.Hm().format(message.timesend),
                                 style: TextStyle(fontSize: 12, color: Colors.grey),
                               ),
                             ],

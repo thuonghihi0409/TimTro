@@ -28,6 +28,7 @@ class Messageservice {
 
   // Hàm gửi dữ liệu đến API
   Future<Message?> sendMessage(Message message) async {
+    print("888888888888888888888888888888888888888888" + message.timesend.toString());
     final url = Uri.parse('${API.link}/message');
     try {
       final response = await http.post(

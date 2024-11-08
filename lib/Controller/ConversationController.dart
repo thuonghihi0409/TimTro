@@ -36,7 +36,6 @@ class Conversationcontroller with ChangeNotifier {
     });
     notifyListeners();
   }
-
   void updateLastMessage(String conversationId, Message lastMessage) {
     // Tìm cuộc trò chuyện và cập nhật lastMessage
     for (var conversation in conversations) {

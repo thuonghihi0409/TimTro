@@ -7,6 +7,10 @@ import 'package:uuid/uuid.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:flutter_map/flutter_map.dart';
+import 'package:latlong2/latlong.dart';
+
+import 'MapScreen.dart';
 
 class UploadRentalPropertyScreen extends StatefulWidget {
   @override
@@ -19,23 +23,22 @@ class _UploadRentalPropertyScreenState
   final _formKey = GlobalKey<FormState>();
   String url = "";
 
-  // Các controller để lưu dữ liệu từ người dùng
   TextEditingController _nameController = TextEditingController();
   TextEditingController _addressController = TextEditingController();
   TextEditingController _priceController = TextEditingController();
   TextEditingController _electricityWaterPriceController =
       TextEditingController();
 
-  // Biến lưu trữ tiện ích
   bool wifiAvailable = false;
   bool parkingAvailable = false;
   bool airConditioningAvailable = false;
 
-  // Biến lưu ảnh đã chọn
   XFile? _imageFile;
   final ImagePicker _picker = ImagePicker();
 
-  // Hàm chọn ảnh
+  LatLng _selectedLocation =
+      LatLng(10.8231, 106.6297); // Vị trí mặc định ban đầu
+
   Future<void> _pickImage() async {
     final pickedFile = await _picker.pickImage(source: ImageSource.gallery);
     setState(() {
@@ -47,16 +50,11 @@ class _UploadRentalPropertyScreenState
     if (_imageFile == null) return;
 
     try {
-      // Lấy đường dẫn tham chiếu đến Firebase Storage
       final uuid = Uuid();
       final storageRef =
           FirebaseStorage.instance.ref().child("images/${uuid.v4()}");
-      // Tải lên tệp
       await storageRef.putFile(File(_imageFile!.path));
-
-      // Lấy URL của tệp đã tải lên
       url = await storageRef.getDownloadURL();
-
       print('Image uploaded successfully: $url');
     } catch (e) {
       print('Error uploading image: $e');
@@ -65,7 +63,7 @@ class _UploadRentalPropertyScreenState
 
   @override
   Widget build(BuildContext context) {
-    final usercontroler = context.watch<Usercontroller>();
+    final usercontroller = context.watch<Usercontroller>();
     return SafeArea(
       child: Scaffold(
         appBar: AppBar(
@@ -111,7 +109,8 @@ class _UploadRentalPropertyScreenState
                   ),
                   TextFormField(
                     controller: _electricityWaterPriceController,
-                    decoration: InputDecoration(labelText: 'Giá điện nước (VNĐ)'),
+                    decoration:
+                        InputDecoration(labelText: 'Giá điện nước (VNĐ)'),
                     keyboardType: TextInputType.number,
                     validator: (value) {
                       if (value == null || value.isEmpty) {
@@ -158,28 +157,66 @@ class _UploadRentalPropertyScreenState
                     child: Text('Chọn hình ảnh'),
                   ),
                   SizedBox(height: 16),
+                  // Bản đồ chọn vị trí
+                  Text('Chọn vị trí trên bản đồ:'),
+                  SizedBox(
+                    height: 300,
+                    child: FlutterMap(
+                      options: MapOptions(
+                        center: _selectedLocation,
+                        zoom: 13.0,
+                        onTap: (tapPosition, point) {
+                          setState(() {
+                            _selectedLocation = point;
+                          });
+                        },
+                      ),
+                      children: [
+                        TileLayer(
+                          urlTemplate:
+                              "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
+                          subdomains: ['a', 'b', 'c'],
+                        ),
+                        MarkerLayer(
+                          markers: [
+                            Marker(
+                              point: _selectedLocation,
+                              builder: (ctx) => Icon(
+                                Icons.location_pin,
+                                color: Colors.red,
+                                size: 40,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                  SizedBox(height: 16),
                   ElevatedButton(
                     onPressed: () async {
                       if (_formKey.currentState!.validate()) {
-                        final rentalcontroller = context.read<Rentalpropertycontroller>();
-                         await _uploadImage();
-                        RentalProperty rentalproperty = new RentalProperty(
-                            propertyId: "hihi",
-                            propertyName: _nameController.text,
-                            address: _addressController.text,
-                            rentPrice: _priceController.text,
-                            description: "mo ta ",
-                            area: 50,
-                            availableRooms: 1,
-                            image: url,
-                            postDate: DateTime.now(),
-                            updateDate: DateTime.now(),
-                            landlord: usercontroler.user!);
-                        print("00000000000000000000000");
+                        final rentalcontroller =
+                            context.read<Rentalpropertycontroller>();
+                        await _uploadImage();
+                        RentalProperty rentalproperty = RentalProperty(
+                          propertyId: "hihi",
+                          propertyName: _nameController.text,
+                          address: _addressController.text,
+                          rentPrice: _priceController.text,
+                          description: "mo ta ",
+                          area: 50,
+                          availableRooms: 1,
+                          image: url,
+                          postDate: DateTime.now(),
+                          updateDate: DateTime.now(),
+                          landlord: usercontroller.user!,
+                          // latitude: _selectedLocation.latitude, // Tọa độ đã chọn
+                          // longitude: _selectedLocation.longitude,
+                        );
                         rentalcontroller.postRental(rentalproperty);
                         Navigator.pop(context);
                       }
-      
                     },
                     child: Text('Đăng tin'),
                   ),
@@ -192,3 +229,57 @@ class _UploadRentalPropertyScreenState
     );
   }
 }
+
+
+
+// class UploadRentalPropertyScreen extends StatefulWidget {
+//   @override
+//   _UploadRentalPropertyScreenState createState() =>
+//       _UploadRentalPropertyScreenState();
+// }
+//
+// class _UploadRentalPropertyScreenState extends State<UploadRentalPropertyScreen> {
+//   String _selectedAddress = "Chưa chọn địa chỉ";
+//   TextEditingController _addressController = TextEditingController();
+//
+//   void _openMapScreen() async {
+//     Navigator.push(
+//       context,
+//       MaterialPageRoute(
+//         builder: (context) => MapScreen(
+//           onLocationSelected: (address) {
+//             setState(() {
+//               _selectedAddress = address;
+//               _addressController.text = address;
+//             });
+//           },
+//         ),
+//       ),
+//     );
+//   }
+//
+//   @override
+//   Widget build(BuildContext context) {
+//     return Scaffold(
+//       appBar: AppBar(
+//         title: Text('Đăng tin cho thuê trọ'),
+//       ),
+//       body: Padding(
+//         padding: const EdgeInsets.all(16.0),
+//         child: Column(
+//           children: [
+//             TextFormField(
+//               controller: _addressController,
+//               decoration: InputDecoration(labelText: 'Địa chỉ'),
+//               readOnly: true,
+//             ),
+//             IconButton(
+//               icon: Icon(Icons.map),
+//               onPressed: _openMapScreen,
+//             ),
+//           ],
+//         ),
+//       ),
+//     );
+//   }
+// }
