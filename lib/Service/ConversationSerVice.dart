@@ -47,4 +47,15 @@ class ConversationService {
       return null;
     }
   }
+  Future<void> deleteConversation(String id) async {
+    final url = Uri.parse('${API.link}/conversation/conversationid=${id}');
+
+    try {
+      final response = await http.delete(url);
+      print("$url");
+    } catch (e) {
+      print('Error: $e');
+      return null;
+    }
+  }
 }

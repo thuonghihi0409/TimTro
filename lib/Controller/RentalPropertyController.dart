@@ -18,6 +18,11 @@ class Rentalpropertycontroller with ChangeNotifier{
   }
 
   Future<List<RentalProperty>> getRentalByLandLord (String id) async{
+    uploadUI();
     return await rentalPropertyservice.getRentalByLandLord(id);
+  }
+  Future<void> deleteRental (String id)async {
+    rentalPropertyservice.deleteRentalProperty(id);
+    uploadUI();
   }
 }

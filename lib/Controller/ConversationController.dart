@@ -10,21 +10,19 @@ class Conversationcontroller with ChangeNotifier {
   List<Conversation> conversations = [];
   ConversationService conversationService = ConversationService();
   Messageservice messageservice = Messageservice();
-
+  void reloadUI (){
+    notifyListeners();
+  }
   Future<void> loadConversation(String userId) async {
     conversations = await conversationService.fetchConversation(userId);
-
     // Cập nhật lastMessage cho từng Conversation
     for (int i = 0; i < conversations.length; i++) {
       conversations[i].lastMessage = await messageservice.lastMessage(conversations[i].conversationId);
     }
-
     // Sắp xếp conversations theo timesend của lastMessage (gần nhất đến xa nhất)
     sortConversationsByLastMessage();
-
     notifyListeners();
   }
-
   void sortConversationsByLastMessage() {
     conversations.sort((a, b) {
       DateTime? timeA = a.lastMessage?.timesend;
@@ -52,5 +50,10 @@ class Conversationcontroller with ChangeNotifier {
     notifyListeners();
     return conversation;
 
+  }
+
+  Future<void> deleteConversation(String conversationId) async {
+   await conversationService.deleteConversation(conversationId);
+    reloadUI();
   }
 }
