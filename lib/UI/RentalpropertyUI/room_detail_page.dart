@@ -4,11 +4,11 @@ import 'package:timtro/Controller/ConversationController.dart';
 import 'package:timtro/Controller/UserController.dart';
 import 'package:timtro/Model/Conversation.dart';
 import 'package:timtro/Model/RentelProperty.dart';
-import 'package:timtro/UI/MapScreen.dart';
-import 'package:timtro/UI/chat_view_tab.dart';
+import 'package:timtro/UI/RentalpropertyUI/MapScreen.dart';
+import 'package:timtro/UI/ChatUI/chat_view_tab.dart';
 import 'package:url_launcher/url_launcher.dart';
-import '../utils/colors.dart';
-import '../widgets/room_detail_widget.dart';
+import '../../utils/colors.dart';
+import '../../widgets/room_detail_widget.dart';
 
 class RoomDetailPage extends StatelessWidget {
   final RentalProperty rentalProperty;

@@ -12,7 +12,9 @@ class RentalProperty {
   String description;
   double area;
   int availableRooms;
-  String image;
+  List<String> images;
+  String waterPrice;
+  String electricPrice;
   DateTime postDate;
   DateTime updateDate;
   User landlord;
@@ -25,7 +27,9 @@ class RentalProperty {
     required this.description,
     required this.area,
     required this.availableRooms,
-    required this.image,
+    required this.images,
+    required this.waterPrice,
+    required this.electricPrice,
     required this.postDate,
     required this.updateDate,
     required this.landlord,
@@ -56,7 +60,9 @@ class RentalProperty {
       description: json['description'] as String,
       area: (json['area'] as num).toDouble(), // Chuyển đổi số thành double
       availableRooms: json['availableRooms'] as int,
-      image: json['image'] as String,
+      images: List<String>.from(json['images'] ?? []),
+      waterPrice: json['waterPrice'] ?? "0" as String ,
+      electricPrice: json['electricPrice'] ?? "0" as String ,
       postDate: DateTime.parse(json['postDate'] as String),
       updateDate: DateTime.parse(json['updateDate'] as String),
       landlord: User.fromJson(json ["landlord"]),  // Chuyển đổi đối tượng Landlord
@@ -73,7 +79,9 @@ class RentalProperty {
       'description': description,
       'area': area,
       'availableRooms': availableRooms,
-      'image': image,
+      'images': images,
+      'waterPrice': waterPrice,
+      'electricPrice': electricPrice,
       'postDate': postDate.toIso8601String(),
       'updateDate': updateDate.toIso8601String(),
       'landlordId': landlord.id,

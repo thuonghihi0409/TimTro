@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:http/http.dart' as http;
 import 'package:timtro/Model/RentelProperty.dart';
+import 'package:timtro/Model/Utility.dart';
 import 'package:timtro/utils/dimensions.dart';
 
 class Rentalpropertyservice {
@@ -52,12 +53,56 @@ class Rentalpropertyservice {
       return [];
     }
   }
+  Future <List <RentalProperty>> getRentalByUtility(String id) async {
+    try {
+      final response = await http.get(
+        Uri.parse("${API.link}/property-utilities/utilityid=${id}"),
+        headers: {
+          'Content-Type': 'application/json; charset=UTF-8',
+        },
+      );
+      if (response.statusCode == 200) {
+        print("hihi kk ${json.decode(utf8.decode(response.bodyBytes))}");
+        final List<dynamic> jsonResponse = json.decode(utf8.decode(response.bodyBytes));
+        return jsonResponse
+            .map((property) => RentalProperty.fromJson(property))
+            .toList();
+      } else {
+        throw Exception('Failed to load rental properties');
+      }
+    } catch (e) {
+      print('Error fetching rental properties: $e');
+      return [];
+    }
+  }
 
+  Future <List <Utility>> getUtilities() async {
+    try {
+      final response = await http.get(
+        Uri.parse("${API.link}/utilities"),
+        headers: {
+          'Content-Type': 'application/json; charset=UTF-8',
+        },
+      );
+      if (response.statusCode == 200) {
+        print("hihi${json.decode(utf8.decode(response.bodyBytes))}");
+        final List<dynamic> jsonResponse = json.decode(utf8.decode(response.bodyBytes));
+        return jsonResponse
+            .map((property) => Utility.fromJson(property))
+            .toList();
+      } else {
+        throw Exception('Failed to load rental properties');
+      }
+    } catch (e) {
+      print('Error fetching rental properties: $e');
+      return [];
+    }
+  }
 
   Future<bool> postRentalProperty(RentalProperty property) async {
     try {
       final url = Uri.parse("${API.link}/rentalproperty");
-      print("${property.toJson()}");
+      print("==========================${jsonEncode(property.toJson())}");
 
       final response = await http.post(
         url,

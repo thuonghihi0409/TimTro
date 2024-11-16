@@ -3,17 +3,17 @@ import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:timtro/Controller/RentalPropertyController.dart';
 import 'package:timtro/Controller/UserController.dart';
-import 'package:timtro/UI/LoginPage.dart';
-import 'package:timtro/UI/UploadImage.dart';
-import 'package:timtro/UI/find_tab.dart';
-import 'package:timtro/UI/info_customer.dart';
-import 'package:timtro/UI/room_detail_page.dart';
-import 'package:timtro/UI/upRentalpropertyscreen.dart';
+import 'package:timtro/UI/AccountUI/LoginPage.dart';
+import 'package:timtro/UI/RentalpropertyUI/UploadImage.dart';
+import 'package:timtro/UI/RentalpropertyUI/find_tab.dart';
+import 'package:timtro/UI/AccountUI/info_customer.dart';
+import 'package:timtro/UI/RentalpropertyUI/room_detail_page.dart';
+import 'package:timtro/UI/RentalpropertyUI/upRentalpropertyscreen.dart';
 import 'package:timtro/utils/colors.dart';
 import 'package:timtro/widgets/big_text.dart';
 import 'package:timtro/widgets/icon_and_text_widget.dart';
 import 'package:timtro/widgets/small_text.dart';
-import '../Model/RentelProperty.dart';
+import '../../Model/RentelProperty.dart';
 import 'RegisterPage.dart';
 
 class AccountTab1 extends StatelessWidget {
@@ -158,11 +158,13 @@ class _AccountTab2State extends State<AccountTab2> {
   @override
   void initState() {
     super.initState();
-    _loadRentalProperties();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _loadRentalProperties();
+    });
   }
 
   Future<void> _loadRentalProperties() async {
-    final rentalController = context.read<Rentalpropertycontroller>();
+    final rentalController =  context.read<Rentalpropertycontroller>();
     final userController = context.read<Usercontroller>();
 
     // Kiểm tra user trước khi lấy danh sách bất động sản
@@ -354,8 +356,8 @@ class _ItemState extends State<Item> {
               ),
               child: ClipRRect(
                 borderRadius: BorderRadius.circular(20),
-                child: widget.rentalProperty.image.isNotEmpty
-                    ? Image.network(widget.rentalProperty.image,
+                child: widget.rentalProperty.images.isNotEmpty
+                    ? Image.network(widget.rentalProperty.images[0],
                     fit: BoxFit.cover,
                     errorBuilder: (context, error, stackTrace) {
                       return Center(child: Text('Error loading image'));

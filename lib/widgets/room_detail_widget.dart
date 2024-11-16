@@ -24,13 +24,13 @@ class RoomDetailWidget extends StatelessWidget {
               height: 300,
               child: PageView.builder(
                 controller: _pageController,
-                itemCount: 1, // Giả sử bạn chỉ có 1 ảnh cho mỗi phòng
+                itemCount: rentalProperty.images.length, // Giả sử bạn chỉ có 1 ảnh cho mỗi phòng
                 onPageChanged: (index) {
                   _currentPage = index;
                 },
                 itemBuilder: (context, index) {
                   return Image.network(
-                    rentalProperty.image, // URL hình ảnh từ rentalProperty
+                    rentalProperty.images[index], // URL hình ảnh từ rentalProperty
                     fit: BoxFit.cover,
                     errorBuilder: (context, error, stackTrace) {
                       return Center(child: Text('Failed to load image'));
@@ -47,7 +47,7 @@ class RoomDetailWidget extends StatelessWidget {
                 padding: EdgeInsets.all(8),
                 color: Colors.black54,
                 child: Text(
-                  '${_currentPage + 1}/1', // Hiện 1 ảnh nên tổng là 1
+                  '${_currentPage + 1}/${rentalProperty.images.length}', // Hiện 1 ảnh nên tổng là 1
                   style: TextStyle(color: Colors.white, fontSize: 16),
                 ),
               ),
@@ -112,7 +112,7 @@ class RoomDetailWidget extends StatelessWidget {
                   .toList(),
             ),
             TableRow(
-              children: ['3.800/kWh', '80.000/ng', '80.000/xe', '0/ph']
+              children: ['${rentalProperty.electricPrice}', '${rentalProperty.waterPrice}', '80.000/xe', '0/ph']
                   .map((value) => Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: Text(value),

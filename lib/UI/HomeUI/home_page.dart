@@ -2,12 +2,12 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:timtro/Controller/UserController.dart';
-import 'package:timtro/UI/account_tab.dart';
-import 'package:timtro/UI/chat_tab.dart';
-import 'package:timtro/UI/find_tab.dart';
-import 'package:timtro/UI/home_tab.dart';
+import 'package:timtro/UI/AccountUI/account_tab.dart';
+import 'package:timtro/UI/ChatUI/chat_tab.dart';
+import 'package:timtro/UI/RentalpropertyUI/find_tab.dart';
+import 'package:timtro/UI/HomeUI/home_tab.dart';
 import 'package:timtro/utils/colors.dart';
-import 'package:timtro/UI/info_customer.dart';
+import 'package:timtro/UI/AccountUI/info_customer.dart';
 class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
@@ -29,27 +29,34 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+  final CupertinoTabController controller = CupertinoTabController();
 
-  final List<Widget> _tabs= [
-    HomeTab(),
-    ChatTab(),
-    FindTab(),
-    AccountTab1(),
-
-  ];
   @override
   void initState() {
     super.initState();
     final usercontroller = context.read<Usercontroller>();
     usercontroller.loadState(); // Gọi loadState một lần khi widget được khởi tạo
   }
+  void dispose() {
+    controller.dispose();
+    super.dispose();
+  }
   @override
   Widget build(BuildContext context) {
+
     final usercontroler = context.watch<Usercontroller>();
-    _tabs[1]= usercontroler.state==0 ? ChatTab() : ConversationsScreen() ;
-    _tabs[3]= usercontroler.state==0 ? AccountTab1() : AccountTab2() ;
+    final chatTab = usercontroler.state == 0 ? ChatTab() : ConversationsScreen();
+    final accountTab = usercontroler.state == 0 ? AccountTab1() : AccountTab2();
+    final List<Widget> _tabs = [
+      HomeTab(tabController: controller),
+      chatTab,
+      FindTab(),
+      accountTab,
+    ];
+
     return SafeArea(
         child: CupertinoTabScaffold(
+          controller: controller,
           tabBar: CupertinoTabBar(
             activeColor: AppColors.mainColor,
             inactiveColor: Colors.grey,
@@ -65,6 +72,9 @@ class _HomePageState extends State<HomePage> {
             ],
           ),
           tabBuilder: (BuildContext context, int index) {
+            if (index == 0) {
+              return HomeTab(tabController: controller);
+            }
             return _tabs[index];
           },
         )

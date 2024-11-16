@@ -5,7 +5,7 @@ import 'package:timtro/Controller/ConversationController.dart';
 import 'package:timtro/Controller/MessageController.dart';
 import 'package:timtro/Controller/RentalPropertyController.dart';
 import 'package:timtro/Controller/UserController.dart';
-import 'package:timtro/UI/home_page.dart';
+import 'package:timtro/UI/HomeUI/home_page.dart';
 import 'package:firebase_core/firebase_core.dart';
 
 Future<void> main() async {

@@ -127,9 +127,10 @@ class _SearchWidgetState extends State<SearchWidget> {
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      width: 300,
+      height: 70,
+      width: 250,
       child: Container(
-        margin: EdgeInsets.only(top: 20),
+        margin: EdgeInsets.only(top: 10),
         child: TextField(
           controller: _searchController,
           onChanged: (value) {

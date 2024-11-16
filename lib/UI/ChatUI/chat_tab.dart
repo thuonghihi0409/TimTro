@@ -5,7 +5,7 @@ import 'package:timtro/Controller/ConversationController.dart';
 import 'package:timtro/Controller/MessageController.dart';
 import 'package:timtro/Controller/UserController.dart';
 import 'package:timtro/Model/Conversation.dart';
-import 'package:timtro/UI/chat_view_tab.dart';
+import 'package:timtro/UI/ChatUI/chat_view_tab.dart';
 import 'package:timtro/utils/colors.dart';
 
 class ChatTab extends StatefulWidget {

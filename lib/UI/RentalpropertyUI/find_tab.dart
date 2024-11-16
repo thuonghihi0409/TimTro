@@ -3,13 +3,14 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:timtro/Controller/RentalPropertyController.dart';
 import 'package:timtro/Model/RentelProperty.dart';
-import 'package:timtro/UI/room_detail_page.dart';
+import 'package:timtro/UI/RentalpropertyUI/room_detail_page.dart';
 import 'package:timtro/utils/colors.dart';
 import 'package:timtro/widgets/big_text.dart';
 import 'package:timtro/widgets/small_text.dart';
-import '../widgets/icon_and_text_widget.dart';
-import '../widgets/search.dart';
-import 'package:intl/intl.dart';  // Thêm dòng này
+import '../../Model/Utility.dart';
+import '../../widgets/icon_and_text_widget.dart';
+import '../../widgets/search.dart';
+import 'package:intl/intl.dart'; // Thêm dòng này
 
 class FindTab extends StatefulWidget {
   @override
@@ -18,12 +19,19 @@ class FindTab extends StatefulWidget {
 
 class _FindTabState extends State<FindTab> {
   String searchQuery = "";
+  List<Utility> list = [];
 
   @override
   void initState() {
     super.initState();
     final rentalController = context.read<Rentalpropertycontroller>();
-    rentalController.setRental(); // Gọi loadState một lần khi widget được khởi tạo
+    _fetchUtilities();
+    rentalController
+        .setRental(); // Gọi loadState một lần khi widget được khởi tạo
+  }
+
+  void _fetchUtilities() async {
+    list = await context.read<Rentalpropertycontroller>().getUtilities();
   }
 
   @override
@@ -31,30 +39,77 @@ class _FindTabState extends State<FindTab> {
     final rentalpropertycontroller = context.watch<Rentalpropertycontroller>();
     final filteredList = rentalpropertycontroller.listRental
         .where((property) => property.propertyName
-        .toLowerCase()
-        .contains(searchQuery.toLowerCase()))
+            .toLowerCase()
+            .contains(searchQuery.toLowerCase()))
         .toList();
-
     return SafeArea(
       child: Scaffold(
         body: Column(
           children: [
-            Container(
-              padding: EdgeInsets.all(10),
-              child: SearchWidget(
-                onSearch: (query) {
-                  setState(() {
-                    searchQuery = query; // Cập nhật truy vấn tìm kiếm
-                  });
-                },
-              ),
+            Row(
+              children: [
+                Container(
+                  padding: EdgeInsets.all(5),
+                  child: SearchWidget(
+                    onSearch: (query) {
+                      setState(() {
+                        searchQuery = query; // Cập nhật truy vấn tìm kiếm
+                      });
+                    },
+                  ),
+                ),
+                SizedBox(
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 5),
+                    // Thêm padding nhỏ để gọn hơn
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      border: Border.all(color: Colors.grey.shade300),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: DropdownMenu<String>(
+                      initialSelection: "",
+                      dropdownMenuEntries: [
+                        DropdownMenuEntry<String>(
+                          value: "",
+                          label: "Tất cả",
+                        ),
+                        ...list
+                            .map(
+                              (toElement) => DropdownMenuEntry<String>(
+                                value: toElement.utilityId,
+                                label: toElement.utilityName,
+                              ),
+                            )
+                            .toList(),
+                      ],
+                      textStyle: const TextStyle(
+                        fontSize: 12, // Giảm kích thước chữ
+                        color: Colors.black,
+                      ),
+                      menuStyle: MenuStyle(
+                        minimumSize: MaterialStateProperty.all(
+                            const Size(50, 100)), // Giới hạn kích thước menu
+                        visualDensity:
+                            VisualDensity.compact, // Giảm mật độ hiển thị
+                      ),
+                      onSelected: (String? value) {
+                        rentalpropertycontroller.setSelect(value);
+                        rentalpropertycontroller.setRental();
+                        rentalpropertycontroller.uploadUI();
+                      },
+                    ),
+                  ),
+                ),
+              ],
             ),
             Expanded(
               child: ListView.builder(
                 physics: AlwaysScrollableScrollPhysics(),
                 itemCount: filteredList.length,
                 itemBuilder: (context, index) {
-                  final toElement = filteredList[index]; // Lấy phần tử dựa trên index
+                  final toElement =
+                      filteredList[index]; // Lấy phần tử dựa trên index
                   return Item(rentalProperty: toElement); // Trả về widget Item
                 },
               ),
@@ -65,8 +120,6 @@ class _FindTabState extends State<FindTab> {
     );
   }
 }
-
-
 
 class Item extends StatefulWidget {
   final RentalProperty rentalProperty;
@@ -81,7 +134,8 @@ class _ItemState extends State<Item> {
   @override
   Widget build(BuildContext context) {
     // Khởi tạo NumberFormat với định dạng cho tiền tệ
-    final formatter = NumberFormat('#,##0'); // Định dạng giá với dấu phân cách ngàn
+    final formatter =
+        NumberFormat('#,##0'); // Định dạng giá với dấu phân cách ngàn
 
     // Chuyển đổi rentPrice sang kiểu num nếu cần
     final rentPrice = widget.rentalProperty.rentPrice is String
@@ -102,12 +156,12 @@ class _ItemState extends State<Item> {
               ),
               child: ClipRRect(
                 borderRadius: BorderRadius.circular(20),
-                child: widget.rentalProperty.image.isNotEmpty
-                    ? Image.network(widget.rentalProperty.image,
-                    fit: BoxFit.cover,
-                    errorBuilder: (context, error, stackTrace) {
-                      return Center(child: Text('Error loading image'));
-                    })
+                child: widget.rentalProperty.images.isNotEmpty
+                    ? Image.network(widget.rentalProperty.images[0],
+                        fit: BoxFit.cover,
+                        errorBuilder: (context, error, stackTrace) {
+                        return Center(child: Text('Error loading image'));
+                      })
                     : Center(child: Text('No Image')),
               ),
             ),
@@ -128,11 +182,17 @@ class _ItemState extends State<Item> {
                     children: [
                       BigText(text: "${widget.rentalProperty.propertyName}"),
                       SizedBox(height: 5),
-                      SmallText(text: "Giá: ${formatter.format(rentPrice)} VNĐ"), // Sử dụng formatter
+                      SmallText(
+                          text: "Giá: ${formatter.format(rentPrice)} VNĐ"),
+                      // Sử dụng formatter
                       SizedBox(height: 5),
-                      SmallText(text: "Số phòng còn: ${widget.rentalProperty.availableRooms}"),
+                      SmallText(
+                          text:
+                              "Số phòng còn: ${widget.rentalProperty.availableRooms}"),
                       SizedBox(height: 5),
-                      SmallText(text: "Ngày đăng: ${widget.rentalProperty.postDate.toLocal().toString().split(' ')[0]}"),
+                      SmallText(
+                          text:
+                              "Ngày đăng: ${widget.rentalProperty.postDate.toLocal().toString().split(' ')[0]}"),
                       SizedBox(height: 10),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -165,7 +225,9 @@ class _ItemState extends State<Item> {
       onTap: () {
         Navigator.push(
           context,
-          MaterialPageRoute(builder: (context) => RoomDetailPage(rentalProperty: widget.rentalProperty)),
+          MaterialPageRoute(
+              builder: (context) =>
+                  RoomDetailPage(rentalProperty: widget.rentalProperty)),
         );
       },
     );

@@ -21,45 +21,56 @@ class UploadRentalPropertyScreen extends StatefulWidget {
 class _UploadRentalPropertyScreenState
     extends State<UploadRentalPropertyScreen> {
   final _formKey = GlobalKey<FormState>();
-  String url = "";
+  List <String> url = [];
 
   TextEditingController _nameController = TextEditingController();
   TextEditingController _addressController = TextEditingController();
   TextEditingController _priceController = TextEditingController();
-  TextEditingController _electricityWaterPriceController =
-      TextEditingController();
-
+  TextEditingController _electricityPriceController = TextEditingController();
+  TextEditingController _waterPriceController = TextEditingController();
   bool wifiAvailable = false;
   bool parkingAvailable = false;
   bool airConditioningAvailable = false;
 
-  XFile? _imageFile;
+  List<XFile> _imageFiles = [];
+
   final ImagePicker _picker = ImagePicker();
 
   LatLng _selectedLocation =
       LatLng(10.8231, 106.6297); // Vị trí mặc định ban đầu
 
-  Future<void> _pickImage() async {
-    final pickedFile = await _picker.pickImage(source: ImageSource.gallery);
-    setState(() {
-      _imageFile = pickedFile;
-    });
+  Future<void> _pickMultipleImages() async {
+    final pickedFiles = await _picker.pickMultiImage();
+    if (pickedFiles != null) {
+      setState(() {
+        for (var pickedFile in pickedFiles) {
+          // Lưu các tệp ảnh đã chọn
+          _imageFiles.add(pickedFile);
+        }
+      });
+    }
   }
 
-  Future<void> _uploadImage() async {
-    if (_imageFile == null) return;
+
+  Future<void> _uploadImages() async {
+    if (_imageFiles.isEmpty) return;
 
     try {
       final uuid = Uuid();
-      final storageRef =
-          FirebaseStorage.instance.ref().child("images/${uuid.v4()}");
-      await storageRef.putFile(File(_imageFile!.path));
-      url = await storageRef.getDownloadURL();
-      print('Image uploaded successfully: $url');
+      for (var imageFile in _imageFiles) {
+        final storageRef = FirebaseStorage.instance
+            .ref()
+            .child("images/${uuid.v4()}");
+        await storageRef.putFile(File(imageFile.path));
+        String urli = await storageRef.getDownloadURL();
+        url.add(urli);
+      }
+      print('Images uploaded successfully: $url');
     } catch (e) {
-      print('Error uploading image: $e');
+      print('Error uploading images: $e');
     }
   }
+
 
   @override
   Widget build(BuildContext context) {
@@ -108,13 +119,25 @@ class _UploadRentalPropertyScreenState
                     },
                   ),
                   TextFormField(
-                    controller: _electricityWaterPriceController,
+                    controller: _electricityPriceController,
                     decoration:
-                        InputDecoration(labelText: 'Giá điện nước (VNĐ)'),
+                        InputDecoration(labelText: 'Giá điện (VNĐ)'),
                     keyboardType: TextInputType.number,
                     validator: (value) {
                       if (value == null || value.isEmpty) {
-                        return 'Vui lòng nhập giá điện nước';
+                        return 'Vui lòng nhập giá điện';
+                      }
+                      return null;
+                    },
+                  ),
+                  TextFormField(
+                    controller: _waterPriceController,
+                    decoration:
+                    InputDecoration(labelText: 'Giá nước (VNĐ)'),
+                    keyboardType: TextInputType.number,
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Vui lòng nhập giá nước';
                       }
                       return null;
                     },
@@ -149,11 +172,9 @@ class _UploadRentalPropertyScreenState
                     },
                   ),
                   SizedBox(height: 16),
-                  _imageFile == null
-                      ? Text('Chưa chọn hình ảnh')
-                      : Image.file(File(_imageFile!.path)),
+                  _buildSelectedImages(),
                   ElevatedButton(
-                    onPressed: _pickImage,
+                    onPressed: _pickMultipleImages,
                     child: Text('Chọn hình ảnh'),
                   ),
                   SizedBox(height: 16),
@@ -195,10 +216,11 @@ class _UploadRentalPropertyScreenState
                   SizedBox(height: 16),
                   ElevatedButton(
                     onPressed: () async {
+                      print("====================${_waterPriceController.text}");
                       if (_formKey.currentState!.validate()) {
                         final rentalcontroller =
                             context.read<Rentalpropertycontroller>();
-                        await _uploadImage();
+                        await _uploadImages();
                         RentalProperty rentalproperty = RentalProperty(
                           propertyId: "hihi",
                           propertyName: _nameController.text,
@@ -207,13 +229,16 @@ class _UploadRentalPropertyScreenState
                           description: "mo ta ",
                           area: 50,
                           availableRooms: 1,
-                          image: url,
+                          images: url,
+                          waterPrice: _waterPriceController.text.toString(),
+                          electricPrice: _electricityPriceController.text.toString(),
                           postDate: DateTime.now(),
                           updateDate: DateTime.now(),
                           landlord: usercontroller.user!,
                           // latitude: _selectedLocation.latitude, // Tọa độ đã chọn
                           // longitude: _selectedLocation.longitude,
                         );
+
                         rentalcontroller.postRental(rentalproperty);
                         Navigator.pop(context);
                       }
@@ -228,6 +253,29 @@ class _UploadRentalPropertyScreenState
       ),
     );
   }
+  Widget _buildSelectedImages() {
+    return _imageFiles.isEmpty
+        ? Text('Chưa chọn hình ảnh')
+        : SizedBox(
+      height: 150,
+      child: ListView.builder(
+        scrollDirection: Axis.horizontal,
+        itemCount: _imageFiles.length,
+        itemBuilder: (context, index) {
+          return Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Image.file(
+              File(_imageFiles[index].path),
+              width: 100,
+              height: 100,
+              fit: BoxFit.cover,
+            ),
+          );
+        },
+      ),
+    );
+  }
+
 }
 
 
