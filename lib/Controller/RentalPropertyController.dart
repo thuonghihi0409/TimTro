@@ -38,7 +38,7 @@ class Rentalpropertycontroller with ChangeNotifier{
   }
 
   Future<void> deleteRental (String id)async {
-    rentalPropertyservice.deleteRentalProperty(id);
+    await rentalPropertyservice.deleteRentalProperty(id);
     uploadUI();
   }
 }

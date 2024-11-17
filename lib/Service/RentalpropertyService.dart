@@ -131,9 +131,11 @@ class Rentalpropertyservice {
     }
   }
   Future<void> deleteRentalProperty(String id) async {
+
     try {
       final url = Uri.parse("${API.link}/rentalproperty/rentalpropertyid=${id}");
-      final response = await http.post(url);
+      final response = await http.delete(url);
+      print("hihi");
     } catch (e) {
       print('Error posting property: $e');
     }

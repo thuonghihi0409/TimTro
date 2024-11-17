@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import 'package:timtro/Controller/RentalPropertyController.dart';
 import 'package:timtro/Controller/UserController.dart';
 import 'package:timtro/UI/AccountUI/LoginPage.dart';
+import 'package:timtro/UI/AccountUI/ManagemnetRental.dart';
 import 'package:timtro/UI/RentalpropertyUI/UploadImage.dart';
 import 'package:timtro/UI/RentalpropertyUI/find_tab.dart';
 import 'package:timtro/UI/AccountUI/info_customer.dart';
@@ -101,9 +102,9 @@ class AccountTab1 extends StatelessWidget {
 
   Widget _buildListTile(BuildContext context,
       {required IconData icon,
-        required String title,
-        required VoidCallback onTap,
-        Color iconColor = AppColors.mainColor}) {
+      required String title,
+      required VoidCallback onTap,
+      Color iconColor = AppColors.mainColor}) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
       child: ListTile(
@@ -153,28 +154,7 @@ class AccountTab2 extends StatefulWidget {
 }
 
 class _AccountTab2State extends State<AccountTab2> {
-  List<RentalProperty> listRental = [];
 
-  @override
-  void initState() {
-    super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      _loadRentalProperties();
-    });
-  }
-
-  Future<void> _loadRentalProperties() async {
-    final rentalController =  context.read<Rentalpropertycontroller>();
-    final userController = context.read<Usercontroller>();
-
-    // Kiểm tra user trước khi lấy danh sách bất động sản
-    if (userController.user != null) {
-      final rentals = await rentalController.getRentalByLandLord(userController.user!.id);
-      setState(() {
-        listRental = rentals;
-      });
-    }
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -262,34 +242,47 @@ class _AccountTab2State extends State<AccountTab2> {
                     context,
                     icon: Icons.logout,
                     title: 'Đăng xuất',
-                    onTap: () => _showLogoutConfirmation(context, usercontroller),
+                    onTap: () =>
+                        _showLogoutConfirmation(context, usercontroller),
+                    iconColor: Colors.red,
+                  ),
+                  _buildDivider(),
+                  _buildListTile(
+                    context,
+                    icon: Icons.manage_accounts_outlined,
+                    title: 'Quan ly bai dang',
+                    onTap: () =>{
+                      Navigator.push(context, MaterialPageRoute(builder: (context)=> MyRental()))
+                    },
                     iconColor: Colors.red,
                   ),
                 ],
               ),
             ),
             const SizedBox(height: 10),
-            if (listRental.isNotEmpty)
-              Expanded(
-                child: ListView.builder(
-                  itemCount: listRental.length,
-                  itemBuilder: (context, index) {
-                    final rentalProperty = listRental[index];
-                    return Item(rentalProperty: rentalProperty);
-                  },
-                ),
-              )
-            else
-              Padding(
-                padding: const EdgeInsets.only(top: 20),
-                child: Text(
-                  'Chưa có bất động sản nào.',
-                  style: TextStyle(
-                    fontSize: 16,
-                    color: Colors.grey,
-                  ),
-                ),
-              ),
+            // if (listRental.isNotEmpty)
+            //   Expanded(
+            //     child: ListView.builder(
+            //       itemCount: listRental.length,
+            //       itemBuilder: (context, index) {
+            //         return Item(
+            //           listRental: listRental,
+            //           index: index,
+            //         );
+            //       },
+            //     ),
+            //   )
+            // else
+            //   Padding(
+            //     padding: const EdgeInsets.only(top: 20),
+            //     child: Text(
+            //       'Chưa có bất động sản nào.',
+            //       style: TextStyle(
+            //         fontSize: 16,
+            //         color: Colors.grey,
+            //       ),
+            //     ),
+            //   ),
           ],
         ),
       ),
@@ -298,9 +291,9 @@ class _AccountTab2State extends State<AccountTab2> {
 
   Widget _buildListTile(BuildContext context,
       {required IconData icon,
-        required String title,
-        required VoidCallback onTap,
-        Color iconColor = AppColors.mainColor}) {
+      required String title,
+      required VoidCallback onTap,
+      Color iconColor = AppColors.mainColor}) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
       child: ListTile(
@@ -322,159 +315,10 @@ class _AccountTab2State extends State<AccountTab2> {
 
 
 
-class Item extends StatefulWidget {
-  final RentalProperty rentalProperty;
-
-  Item({super.key, required this.rentalProperty});
-
-  @override
-  State<Item> createState() => _ItemState();
-}
-
-class _ItemState extends State<Item> {
-  @override
-  Widget build(BuildContext context) {
-    // Khởi tạo NumberFormat với định dạng cho tiền tệ
-    final formatter = NumberFormat('#,##0'); // Định dạng giá với dấu phân cách ngàn
-
-    // Chuyển đổi rentPrice sang kiểu num nếu cần
-    final rentPrice = widget.rentalProperty.rentPrice is String
-        ? int.tryParse(widget.rentalProperty.rentPrice) ?? 0
-        : widget.rentalProperty.rentPrice;
-
-    return InkWell(
-      child: Container(
-        margin: EdgeInsets.only(left: 20, right: 20, bottom: 10),
-        child: Row(
-          children: [
-            Container(
-              width: 120,
-              height: 130,
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(20),
-                color: Colors.white38,
-              ),
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(20),
-                child: widget.rentalProperty.images.isNotEmpty
-                    ? Image.network(widget.rentalProperty.images[0],
-                    fit: BoxFit.cover,
-                    errorBuilder: (context, error, stackTrace) {
-                      return Center(child: Text('Error loading image'));
-                    })
-                    : Center(child: Text('No Image')),
-              ),
-            ),
-            Expanded(
-              child: Container(
-                height: 140,
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.only(
-                      topRight: Radius.circular(20),
-                      bottomRight: Radius.circular(20)),
-                  color: Colors.white,
-                ),
-                child: Padding(
-                  padding: EdgeInsets.only(left: 10, right: 10),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          BigText(text: "${widget.rentalProperty.propertyName}"),
-                          PopupMenuButton<String>(
-                            onSelected: (value) {
-                              switch (value) {
-                                case 'edit':
-                                  _editRental();
-                                  break;
-                                case 'delete':
-                                  _deleteRental();
-                                  break;
-                                case 'hide':
-                                  _hideRental();
-                                  break;
-                              }
-                            },
-                            itemBuilder: (BuildContext context) => [
-                              PopupMenuItem(
-                                value: 'edit',
-                                child: Text('Chỉnh sửa'),
-                              ),
-                              PopupMenuItem(
-                                value: 'delete',
-                                child: Text('Xóa'),
-                              ),
-                              PopupMenuItem(
-                                value: 'hide',
-                                child: Text('Ẩn'),
-                              ),
-                            ],
-                          ),
-                        ],
-                      ),
-                      SizedBox(height: 5),
-                      SmallText(text: "Giá: ${formatter.format(rentPrice)} VNĐ"),
-                      SizedBox(height: 5),
-                      SmallText(text: "Số phòng còn: ${widget.rentalProperty.availableRooms}"),
-                      SizedBox(height: 5),
-                      SmallText(text: "Ngày đăng: ${widget.rentalProperty.postDate.toLocal().toString().split(' ')[0]}"),
-                      SizedBox(height: 10),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          IconAndTextWidget(
-                            icon: Icons.star,
-                            text: "4.5",
-                            iconColor: AppColors.inconColor1,
-                          ),
-                          IconAndTextWidget(
-                            icon: Icons.location_on,
-                            text: "1.7km",
-                            iconColor: AppColors.mainColor,
-                          ),
-
-                        ],
-                      )
-                    ],
-                  ),
-                ),
-              ),
-            )
-          ],
-        ),
-      ),
-      onTap: () {
-        Navigator.push(
-          context,
-          MaterialPageRoute(builder: (context) => RoomDetailPage(rentalProperty: widget.rentalProperty)),
-        );
-      },
-    );
-  }
-
-  void _editRental() {
-    // Logic để chỉnh sửa rental
-    print("Chỉnh sửa: ${widget.rentalProperty.propertyName}");
-  }
-
-  void _deleteRental() {
-    // Logic để xóa rental
-    print("Xóa: ${widget.rentalProperty.propertyName}");
-  }
-
-  void _hideRental() {
-    // Logic để ẩn rental
-    print("Ẩn: ${widget.rentalProperty.propertyName}");
-  }
-}
-
-
 //=============================================================
 
-void _showLogoutConfirmation(BuildContext context, Usercontroller usercontroller) {
+void _showLogoutConfirmation(
+    BuildContext context, Usercontroller usercontroller) {
   showDialog(
     context: context,
     builder: (BuildContext context) {

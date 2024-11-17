@@ -1,8 +1,11 @@
 import 'dart:io';
+import 'package:flutter/cupertino.dart';
+import 'package:flutter/widgets.dart';
 import 'package:provider/provider.dart';
 import 'package:timtro/Controller/RentalPropertyController.dart';
 import 'package:timtro/Controller/UserController.dart';
 import 'package:timtro/Model/RentelProperty.dart';
+import 'package:timtro/Model/Utility.dart';
 import 'package:uuid/uuid.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
@@ -21,13 +24,18 @@ class UploadRentalPropertyScreen extends StatefulWidget {
 class _UploadRentalPropertyScreenState
     extends State<UploadRentalPropertyScreen> {
   final _formKey = GlobalKey<FormState>();
-  List <String> url = [];
-
+  List<String> url = [];
+  List<Utility> listUtilities = [];
+  List<bool> isChecked =[];
+  List<Utility> listUtilitiesOfRental=[];
   TextEditingController _nameController = TextEditingController();
   TextEditingController _addressController = TextEditingController();
   TextEditingController _priceController = TextEditingController();
   TextEditingController _electricityPriceController = TextEditingController();
   TextEditingController _waterPriceController = TextEditingController();
+  TextEditingController _descriptionController = TextEditingController();
+  TextEditingController _availableRoomsController = TextEditingController();
+  TextEditingController _areaController = TextEditingController();
   bool wifiAvailable = false;
   bool parkingAvailable = false;
   bool airConditioningAvailable = false;
@@ -51,16 +59,14 @@ class _UploadRentalPropertyScreenState
     }
   }
 
-
   Future<void> _uploadImages() async {
     if (_imageFiles.isEmpty) return;
 
     try {
       final uuid = Uuid();
       for (var imageFile in _imageFiles) {
-        final storageRef = FirebaseStorage.instance
-            .ref()
-            .child("images/${uuid.v4()}");
+        final storageRef =
+            FirebaseStorage.instance.ref().child("images/${uuid.v4()}");
         await storageRef.putFile(File(imageFile.path));
         String urli = await storageRef.getDownloadURL();
         url.add(urli);
@@ -71,10 +77,20 @@ class _UploadRentalPropertyScreenState
     }
   }
 
-
+  void loadUtilities() async {
+    final rentalController = context.read<Rentalpropertycontroller>();
+    listUtilities = await rentalController.getUtilities();
+  }
+@override
+  void initState() {
+    loadUtilities();
+    isChecked = List<bool>.filled(listUtilities.length, false);
+    super.initState();
+  }
   @override
   Widget build(BuildContext context) {
     final usercontroller = context.watch<Usercontroller>();
+    final rentalcontroller = context.read<Rentalpropertycontroller>();
     return SafeArea(
       child: Scaffold(
         appBar: AppBar(
@@ -120,8 +136,7 @@ class _UploadRentalPropertyScreenState
                   ),
                   TextFormField(
                     controller: _electricityPriceController,
-                    decoration:
-                        InputDecoration(labelText: 'Giá điện (VNĐ)'),
+                    decoration: InputDecoration(labelText: 'Giá điện (VNĐ)'),
                     keyboardType: TextInputType.number,
                     validator: (value) {
                       if (value == null || value.isEmpty) {
@@ -132,8 +147,7 @@ class _UploadRentalPropertyScreenState
                   ),
                   TextFormField(
                     controller: _waterPriceController,
-                    decoration:
-                    InputDecoration(labelText: 'Giá nước (VNĐ)'),
+                    decoration: InputDecoration(labelText: 'Giá nước (VNĐ)'),
                     keyboardType: TextInputType.number,
                     validator: (value) {
                       if (value == null || value.isEmpty) {
@@ -142,35 +156,84 @@ class _UploadRentalPropertyScreenState
                       return null;
                     },
                   ),
+                  TextFormField(
+                    controller: _availableRoomsController,
+                    decoration: InputDecoration(labelText: 'Số phòng trống'),
+                    keyboardType: TextInputType.number,
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Vui lòng số phong trống';
+                      }
+                      return null;
+                    },
+                  ),
+
+                  TextFormField(
+                    controller: _areaController,
+                    decoration: InputDecoration(labelText: 'Diện tích'),
+                    keyboardType: TextInputType.number,
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Vui lòng diện tích';
+                      }
+                      return null;
+                    },
+                  ),
+
+                  TextFormField(
+                    controller: _descriptionController,
+                    decoration: InputDecoration(labelText: 'mô tả'),
+                    keyboardType: TextInputType.number,
+                  ),
                   SizedBox(height: 16),
+
                   Text('Tiện ích:'),
-                  CheckboxListTile(
-                    title: Text('Wi-Fi miễn phí'),
-                    value: wifiAvailable,
+                  ...listUtilities
+                      .asMap() // Sử dụng asMap để lấy index của phần tử
+                      .entries
+                      .map((entry) => CheckboxListTile(
+                    title: Text(entry.value.utilityName),
+                    value: isChecked[entry.key],
                     onChanged: (bool? value) {
                       setState(() {
-                        wifiAvailable = value!;
+                        if(isChecked[entry.key]==false){
+                          isChecked[entry.key]=true;
+                          listUtilitiesOfRental.add(entry.value);
+                        } else {
+                          isChecked[entry.key]=false;
+                          listUtilitiesOfRental.remove(entry.value);
+                        }
                       });
                     },
-                  ),
-                  CheckboxListTile(
-                    title: Text('Chỗ đậu xe'),
-                    value: parkingAvailable,
-                    onChanged: (bool? value) {
-                      setState(() {
-                        parkingAvailable = value!;
-                      });
-                    },
-                  ),
-                  CheckboxListTile(
-                    title: Text('Máy lạnh'),
-                    value: airConditioningAvailable,
-                    onChanged: (bool? value) {
-                      setState(() {
-                        airConditioningAvailable = value!;
-                      });
-                    },
-                  ),
+                  ))
+                      .toList(),
+                  // CheckboxListTile(
+                  //   title: Text('Wi-Fi miễn phí'),
+                  //   value: wifiAvailable,
+                  //   onChanged: (bool? value) {
+                  //     setState(() {
+                  //       wifiAvailable = value!;
+                  //     });
+                  //   },
+                  // ),
+                  // CheckboxListTile(
+                  //   title: Text('Chỗ đậu xe'),
+                  //   value: parkingAvailable,
+                  //   onChanged: (bool? value) {
+                  //     setState(() {
+                  //       parkingAvailable = value!;
+                  //     });
+                  //   },
+                  // ),
+                  // CheckboxListTile(
+                  //   title: Text('Máy lạnh'),
+                  //   value: airConditioningAvailable,
+                  //   onChanged: (bool? value) {
+                  //     setState(() {
+                  //       airConditioningAvailable = value!;
+                  //     });
+                  //   },
+                  // ),
                   SizedBox(height: 16),
                   _buildSelectedImages(),
                   ElevatedButton(
@@ -216,22 +279,25 @@ class _UploadRentalPropertyScreenState
                   SizedBox(height: 16),
                   ElevatedButton(
                     onPressed: () async {
-                      print("====================${_waterPriceController.text}");
+                      print(
+                          "====================${_waterPriceController.text}");
                       if (_formKey.currentState!.validate()) {
-                        final rentalcontroller =
-                            context.read<Rentalpropertycontroller>();
                         await _uploadImages();
+                        double area =
+                            double.tryParse(_areaController.text) ?? 0.0;
+                        int number = int.tryParse(_areaController.text) ?? 0;
                         RentalProperty rentalproperty = RentalProperty(
                           propertyId: "hihi",
                           propertyName: _nameController.text,
                           address: _addressController.text,
                           rentPrice: _priceController.text,
-                          description: "mo ta ",
-                          area: 50,
-                          availableRooms: 1,
+                          description: _descriptionController.text ?? " ",
+                          area: area,
+                          availableRooms: number,
                           images: url,
                           waterPrice: _waterPriceController.text.toString(),
-                          electricPrice: _electricityPriceController.text.toString(),
+                          electricPrice:
+                              _electricityPriceController.text.toString(),
                           postDate: DateTime.now(),
                           updateDate: DateTime.now(),
                           landlord: usercontroller.user!,
@@ -253,32 +319,30 @@ class _UploadRentalPropertyScreenState
       ),
     );
   }
+
   Widget _buildSelectedImages() {
     return _imageFiles.isEmpty
         ? Text('Chưa chọn hình ảnh')
         : SizedBox(
-      height: 150,
-      child: ListView.builder(
-        scrollDirection: Axis.horizontal,
-        itemCount: _imageFiles.length,
-        itemBuilder: (context, index) {
-          return Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Image.file(
-              File(_imageFiles[index].path),
-              width: 100,
-              height: 100,
-              fit: BoxFit.cover,
+            height: 150,
+            child: ListView.builder(
+              scrollDirection: Axis.horizontal,
+              itemCount: _imageFiles.length,
+              itemBuilder: (context, index) {
+                return Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Image.file(
+                    File(_imageFiles[index].path),
+                    width: 100,
+                    height: 100,
+                    fit: BoxFit.cover,
+                  ),
+                );
+              },
             ),
           );
-        },
-      ),
-    );
   }
-
 }
-
-
 
 // class UploadRentalPropertyScreen extends StatefulWidget {
 //   @override
