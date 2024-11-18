@@ -18,7 +18,7 @@ class RentalProperty {
   DateTime postDate;
   DateTime updateDate;
   User landlord;
-
+  int status;
   RentalProperty({
     required this.propertyId,
     required this.propertyName,
@@ -33,6 +33,7 @@ class RentalProperty {
     required this.postDate,
     required this.updateDate,
     required this.landlord,
+    required this.status,
   });
 
   // Getters and setters are handled naturally in Dart by accessing the fields directly.
@@ -65,7 +66,8 @@ class RentalProperty {
       electricPrice: json['electricPrice'] ?? "0" as String ,
       postDate: DateTime.parse(json['postDate'] as String),
       updateDate: DateTime.parse(json['updateDate'] as String),
-      landlord: User.fromJson(json ["landlord"]),  // Chuyển đổi đối tượng Landlord
+      landlord: User.fromJson(json ["landlord"]),
+      status: json["status"] ?? 0 as int, // Chuyển đổi đối tượng Landlord
     );
   }
 
@@ -85,6 +87,7 @@ class RentalProperty {
       'postDate': postDate.toIso8601String(),
       'updateDate': updateDate.toIso8601String(),
       'landlordId': landlord.id,
+      "status": status,
     };
   }
 }

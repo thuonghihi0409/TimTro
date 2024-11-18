@@ -37,6 +37,7 @@ class _FindTabState extends State<FindTab> {
   @override
   Widget build(BuildContext context) {
     final rentalpropertycontroller = context.watch<Rentalpropertycontroller>();
+    print("Tong so phong tro =================  ${rentalpropertycontroller.listRental.length}");
     final filteredList = rentalpropertycontroller.listRental
         .where((property) => property.propertyName
             .toLowerCase()

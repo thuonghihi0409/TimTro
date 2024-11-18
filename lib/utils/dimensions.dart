@@ -5,5 +5,5 @@ class Dimensions{
   static double pageViewContainer= screenHeight/3.47;
 }
 class API {
-  static String link = "https://fc2e-113-180-175-41.ngrok-free.app";
+  static String link = "https://aafe-123-22-251-90.ngrok-free.app";
 }

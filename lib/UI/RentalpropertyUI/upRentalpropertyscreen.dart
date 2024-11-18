@@ -24,6 +24,7 @@ class UploadRentalPropertyScreen extends StatefulWidget {
 class _UploadRentalPropertyScreenState
     extends State<UploadRentalPropertyScreen> {
   final _formKey = GlobalKey<FormState>();
+  bool isLoading = true;
   List<String> url = [];
   List<Utility> listUtilities = [];
   List<bool> isChecked =[];
@@ -46,6 +47,15 @@ class _UploadRentalPropertyScreenState
 
   LatLng _selectedLocation =
       LatLng(10.8231, 106.6297); // Vị trí mặc định ban đầu
+
+  @override
+  void initState() {
+    super.initState();
+
+    _fetchUtilies();
+    isChecked = List<bool>.filled(listUtilities.length, false);
+
+  }
 
   Future<void> _pickMultipleImages() async {
     final pickedFiles = await _picker.pickMultiImage();
@@ -77,21 +87,21 @@ class _UploadRentalPropertyScreenState
     }
   }
 
-  void loadUtilities() async {
-    final rentalController = context.read<Rentalpropertycontroller>();
-    listUtilities = await rentalController.getUtilities();
-  }
-@override
-  void initState() {
-    loadUtilities();
-    isChecked = List<bool>.filled(listUtilities.length, false);
-    super.initState();
+  void _fetchUtilies() async {
+     listUtilities = await context.read<Rentalpropertycontroller>().getUtilities() ; // Đợi hàm lấy dữ liệu hoàn tất
+    setState(() {
+      isChecked = List<bool>.filled(listUtilities.length, false);
+      isLoading = false; // Đặt cờ thành false sau khi dữ liệu đã được tải
+    });
   }
   @override
   Widget build(BuildContext context) {
     final usercontroller = context.watch<Usercontroller>();
     final rentalcontroller = context.read<Rentalpropertycontroller>();
-    return SafeArea(
+    if (isLoading) {
+      return const Center(child: CircularProgressIndicator());
+    }
+        return SafeArea(
       child: Scaffold(
         appBar: AppBar(
           title: Text('Đăng tin cho thuê trọ'),
@@ -188,52 +198,27 @@ class _UploadRentalPropertyScreenState
                   SizedBox(height: 16),
 
                   Text('Tiện ích:'),
-                  ...listUtilities
-                      .asMap() // Sử dụng asMap để lấy index của phần tử
-                      .entries
-                      .map((entry) => CheckboxListTile(
-                    title: Text(entry.value.utilityName),
-                    value: isChecked[entry.key],
-                    onChanged: (bool? value) {
-                      setState(() {
-                        if(isChecked[entry.key]==false){
-                          isChecked[entry.key]=true;
-                          listUtilitiesOfRental.add(entry.value);
-                        } else {
-                          isChecked[entry.key]=false;
-                          listUtilitiesOfRental.remove(entry.value);
-                        }
-                      });
-                    },
-                  ))
-                      .toList(),
-                  // CheckboxListTile(
-                  //   title: Text('Wi-Fi miễn phí'),
-                  //   value: wifiAvailable,
-                  //   onChanged: (bool? value) {
-                  //     setState(() {
-                  //       wifiAvailable = value!;
-                  //     });
-                  //   },
-                  // ),
-                  // CheckboxListTile(
-                  //   title: Text('Chỗ đậu xe'),
-                  //   value: parkingAvailable,
-                  //   onChanged: (bool? value) {
-                  //     setState(() {
-                  //       parkingAvailable = value!;
-                  //     });
-                  //   },
-                  // ),
-                  // CheckboxListTile(
-                  //   title: Text('Máy lạnh'),
-                  //   value: airConditioningAvailable,
-                  //   onChanged: (bool? value) {
-                  //     setState(() {
-                  //       airConditioningAvailable = value!;
-                  //     });
-                  //   },
-                  // ),
+                  if (listUtilities.isNotEmpty)
+                    ...listUtilities
+                        .asMap()
+                        .entries
+                        .map((entry) => CheckboxListTile(
+                      title: Text(entry.value.utilityName),
+                      value: isChecked[entry.key] ?? false,
+                      onChanged: (bool? value) {
+                        setState(() {
+                          isChecked[entry.key] = value ?? false;
+                          //isChecked[entry.key]= !isChecked[entry.key];
+                          if (value == true) {
+                            listUtilitiesOfRental.add(entry.value);
+                          } else {
+                            listUtilitiesOfRental.remove(entry.value);
+                          }
+                        });
+                      },
+                    ))
+                        .toList(),
+
                   SizedBox(height: 16),
                   _buildSelectedImages(),
                   ElevatedButton(
@@ -279,8 +264,7 @@ class _UploadRentalPropertyScreenState
                   SizedBox(height: 16),
                   ElevatedButton(
                     onPressed: () async {
-                      print(
-                          "====================${_waterPriceController.text}");
+
                       if (_formKey.currentState!.validate()) {
                         await _uploadImages();
                         double area =
@@ -294,18 +278,19 @@ class _UploadRentalPropertyScreenState
                           description: _descriptionController.text ?? " ",
                           area: area,
                           availableRooms: number,
-                          images: url,
+                          images: url?? [],
                           waterPrice: _waterPriceController.text.toString(),
                           electricPrice:
                               _electricityPriceController.text.toString(),
                           postDate: DateTime.now(),
                           updateDate: DateTime.now(),
                           landlord: usercontroller.user!,
+                          status: 0,
                           // latitude: _selectedLocation.latitude, // Tọa độ đã chọn
                           // longitude: _selectedLocation.longitude,
                         );
 
-                        rentalcontroller.postRental(rentalproperty);
+                        await rentalcontroller.postRental(rentalproperty, listUtilitiesOfRental);
                         Navigator.pop(context);
                       }
                     },

@@ -100,7 +100,7 @@ class _MyRentalState extends State<MyRental> {
             ),
             Expanded(
               child: Container(
-                height: 140,
+                height: 150,
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.only(
                       topRight: Radius.circular(20),
@@ -150,18 +150,21 @@ class _MyRentalState extends State<MyRental> {
                           ),
                         ],
                       ),
-                      SizedBox(height: 5),
+                      SizedBox(height: 1),
                       SmallText(
                           text: "Giá: ${formatter.format(rentPrice)} VNĐ"),
-                      SizedBox(height: 5),
+                      SizedBox(height: 2),
                       SmallText(
                           text:
                           "Số phòng còn: ${listRental[index].availableRooms}"),
-                      SizedBox(height: 5),
+                      SizedBox(height: 2),
                       SmallText(
                           text:
                           "Ngày đăng: ${listRental[index].postDate.toLocal().toString().split(' ')[0]}"),
-                      SizedBox(height: 10),
+                      SizedBox(height: 5),
+                      if(listRental[index].status==0) Text("Đã duyệt"),
+                      if(listRental[index].status==1) Text("Đang chờ duyệt"),
+                      if(listRental[index].status==-1) Text("Từ chối"),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
@@ -176,7 +179,8 @@ class _MyRentalState extends State<MyRental> {
                             iconColor: AppColors.mainColor,
                           ),
                         ],
-                      )
+                      ),
+
                     ],
                   ),
                 ),

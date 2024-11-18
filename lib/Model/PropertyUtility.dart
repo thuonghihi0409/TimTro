@@ -22,8 +22,8 @@ class PropertyUtility {
   Map<String, dynamic> toJson() {
     return {
       'propertyUtilityId': propertyUtilityId,
-      'rentalProperty': rentalProperty.toJson(),
-      'utility': utility.toJson(),
+      'rentalPropertyId': rentalProperty.propertyId,
+      'utilityId': utility.utilityId,
     };
   }
 }

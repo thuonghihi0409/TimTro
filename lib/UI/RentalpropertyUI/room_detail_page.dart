@@ -1,22 +1,47 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:timtro/Controller/ConversationController.dart';
+import 'package:timtro/Controller/RentalPropertyController.dart';
 import 'package:timtro/Controller/UserController.dart';
 import 'package:timtro/Model/Conversation.dart';
 import 'package:timtro/Model/RentelProperty.dart';
+import 'package:timtro/Model/Utility.dart';
 import 'package:timtro/UI/RentalpropertyUI/MapScreen.dart';
 import 'package:timtro/UI/ChatUI/chat_view_tab.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../../utils/colors.dart';
 import '../../widgets/room_detail_widget.dart';
 
-class RoomDetailPage extends StatelessWidget {
+class RoomDetailPage extends StatefulWidget {
   final RentalProperty rentalProperty;
 
   const RoomDetailPage({super.key, required this.rentalProperty});
 
   @override
+  State<RoomDetailPage> createState() => _RoomDetailPageState();
+}
+
+class _RoomDetailPageState extends State<RoomDetailPage> {
+  List<Utility> list=[];
+  bool isloading =true;
+  @override
+  void initState() {
+
+    // TODO: implement initState
+    super.initState();
+    loadUtility();
+
+  }
+  void loadUtility() async {
+    final rentalpropertycontroller = context.read<Rentalpropertycontroller>();
+    list= await rentalpropertycontroller.getUtilitiesByRental(widget.rentalProperty.propertyId);
+    setState(() {
+      isloading=false;
+    });
+  }
+  @override
   Widget build(BuildContext context) {
+    if(isloading) return const Center(child: CircularProgressIndicator());
     return SafeArea(
       child: Scaffold(
         appBar: AppBar(
@@ -29,7 +54,7 @@ class RoomDetailPage extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                RoomDetailWidget(rentalProperty: rentalProperty),
+                RoomDetailWidget(rentalProperty: widget.rentalProperty),
                 SizedBox(height: 20),
                 Text(
                   'Mô tả:',
@@ -37,7 +62,7 @@ class RoomDetailPage extends StatelessWidget {
                 ),
                 SizedBox(height: 5),
                 Text(
-                  rentalProperty.description,
+                  widget.rentalProperty.description,
                   style: TextStyle(fontSize: 16),
                 ),
                 SizedBox(height: 20),
@@ -65,20 +90,20 @@ class RoomDetailPage extends StatelessWidget {
                               conversationController.conversations.firstWhere(
                                   (conv) =>
                                       conv.user2.id ==
-                                          rentalProperty.landlord.id ||
+                                          widget.rentalProperty.landlord.id ||
                                       conv.user1.id ==
-                                          rentalProperty.landlord.id,
+                                          widget.rentalProperty.landlord.id,
                                   orElse: () => Conversation(
                                       conversationId: "",
                                       user1: userController.user!,
-                                      user2: rentalProperty.landlord));
+                                      user2: widget.rentalProperty.landlord));
 
                           if (conversation.conversationId == "") {
                             conversation = await conversationController
                                 .newConversation(Conversation(
                                     conversationId: "",
                                     user1: userController.user!,
-                                    user2: rentalProperty.landlord));
+                                    user2: widget.rentalProperty.landlord));
                           }
                           Navigator.push(
                             context,
@@ -95,7 +120,7 @@ class RoomDetailPage extends StatelessWidget {
                         icon: Icons.phone,
                         onPressed: () async {
                           final Uri phoneUri = Uri(
-                              scheme: 'tel', path: rentalProperty.landlord.sdt);
+                              scheme: 'tel', path: widget.rentalProperty.landlord.sdt);
 
                           if (await canLaunchUrl(phoneUri)) {
                             await launchUrl(phoneUri);
