@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:timtro/Model/PropertyUtility.dart';
 import 'package:timtro/Model/RentelProperty.dart';
 import 'package:timtro/Model/Utility.dart';
@@ -20,13 +22,55 @@ class Rentalpropertycontroller with ChangeNotifier{
      else listRental= await rentalPropertyservice.getRentalByUtility(select!) as List;
     uploadUI();
   }
-   Future <void> postRental (RentalProperty rental, List<Utility> list) async {
-    await rentalPropertyservice.postRentalProperty(rental);
-     for(Utility utility in list){
-      await rentalPropertyservice.postUtilityOfRentalProperty(PropertyUtility(propertyUtilityId: "xx", rentalProperty: rental, utility: utility));
-     }
-     uploadUI();
+
+  Future<void> postRental(RentalProperty rental, List<Utility> list) async {
+    // Tạo Completer để quản lý quá trình chờ đợi
+    Completer<RentalProperty> completer = Completer<RentalProperty>();
+
+    try {
+      // Gọi API để tạo rental
+      RentalProperty? createdRental = await rentalPropertyservice.postRentalProperty(rental);
+
+      // Kiểm tra nếu rental được tạo thành công
+      if (createdRental != null) {
+        completer.complete(createdRental); // Hoàn tất Completer
+      } else {
+        completer.completeError("Không tạo được rental");
+        return;
+      }
+
+      // Chờ đến khi Completer hoàn thành
+      RentalProperty rentalProperty = await completer.future;
+
+      print("Rental đã được tạo với ID: ${rentalProperty.propertyName}");
+
+      // Đăng lần lượt từng Utility
+      for (Utility utility in list) {
+        PropertyUtility propertyUtility = PropertyUtility(
+          propertyUtilityId: "kokoko",
+          rentalProperty: rentalProperty,
+          utility: utility,
+        );
+
+        bool isSuccess = await rentalPropertyservice.postUtilityOfRentalProperty(propertyUtility);
+
+        if (isSuccess) {
+          print("Utility ${utility.utilityName} đã được lưu thành công");
+        } else {
+          print("Không thể lưu Utility ${utility.utilityName}");
+          return; // Nếu gặp lỗi thì dừng lại
+        }
+      }
+
+      // Sau khi hoàn thành, cập nhật giao diện
+      uploadUI();
+
+    } catch (e) {
+      print("Lỗi xảy ra: $e");
+    }
   }
+
+
   Future<List<RentalProperty>> getRentalByLandLord (String id) async{
     uploadUI();
     return await rentalPropertyservice.getRentalByLandLord(id);

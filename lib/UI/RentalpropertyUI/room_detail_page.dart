@@ -6,11 +6,13 @@ import 'package:timtro/Controller/UserController.dart';
 import 'package:timtro/Model/Conversation.dart';
 import 'package:timtro/Model/RentelProperty.dart';
 import 'package:timtro/Model/Utility.dart';
+import 'package:timtro/UI/AccountUI/personal_acount_view.dart';
 import 'package:timtro/UI/RentalpropertyUI/MapScreen.dart';
 import 'package:timtro/UI/ChatUI/chat_view_tab.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../../utils/colors.dart';
 import '../../widgets/room_detail_widget.dart';
+ // Import trang cá nhân của chủ trọ
 
 class RoomDetailPage extends StatefulWidget {
   final RentalProperty rentalProperty;
@@ -22,136 +24,178 @@ class RoomDetailPage extends StatefulWidget {
 }
 
 class _RoomDetailPageState extends State<RoomDetailPage> {
-  List<Utility> list=[];
-  bool isloading =true;
+  List<Utility> utilities = [];
+  bool isLoading = true;
+
   @override
   void initState() {
-
-    // TODO: implement initState
     super.initState();
     loadUtility();
-
   }
+
   void loadUtility() async {
-    final rentalpropertycontroller = context.read<Rentalpropertycontroller>();
-    list= await rentalpropertycontroller.getUtilitiesByRental(widget.rentalProperty.propertyId);
+    final rentalPropertyController = context.read<Rentalpropertycontroller>();
+    utilities = await rentalPropertyController.getUtilitiesByRental(widget.rentalProperty.propertyId);
     setState(() {
-      isloading=false;
+      isLoading = false;
     });
   }
+
   @override
   Widget build(BuildContext context) {
-    if(isloading) return const Center(child: CircularProgressIndicator());
     return SafeArea(
       child: Scaffold(
         appBar: AppBar(
-          title: Text('Chi tiết phòng'),
+          title: const Text('Chi tiết phòng'),
           backgroundColor: AppColors.mainColor,
         ),
-        body: SingleChildScrollView(
+        body: isLoading
+            ? const Center(child: CircularProgressIndicator())
+            : SingleChildScrollView(
           child: Padding(
             padding: const EdgeInsets.all(16.0),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 RoomDetailWidget(rentalProperty: widget.rentalProperty),
-                SizedBox(height: 20),
-                Text(
+                const SizedBox(height: 20),
+                const Text(
                   'Mô tả:',
                   style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                 ),
-                SizedBox(height: 5),
+                const SizedBox(height: 5),
                 Text(
                   widget.rentalProperty.description,
-                  style: TextStyle(fontSize: 16),
+                  style: const TextStyle(fontSize: 16),
                 ),
-                SizedBox(height: 20),
-                // Các nút hành động
-                Container(
-                  margin: EdgeInsets.only(top: 80),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceAround,
-                    children: [
-                      ActionButton(
-                        icon: Icons.calendar_today,
-                        onPressed: () {},
+                const SizedBox(height: 20),
+                // Hiển thị tên chủ trọ và cho phép nhấn vào để xem trang cá nhân
+                GestureDetector(
+                  onTap: () {
+                   // Chuyển tới trang cá nhân của chủ trọ
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => LandlordProfilePage(
+                          landlord: widget.rentalProperty.landlord,
+                        ),
                       ),
-                      ActionButton(
-                        icon: Icons.chat,
-                        onPressed: () async {
-                          final conversationController =
-                              Provider.of<Conversationcontroller>(context,
-                                  listen: false);
-                          final userController = Provider.of<Usercontroller>(
-                              context,
-                              listen: false);
+                    );
+                   // Navigator.push(context, MaterialPageRoute(builder: (context)=> PersonalAcountView()));
+                  },
+                  child: Text(
+                    'Chủ trọ: ${widget.rentalProperty.landlord.name}',
+                    style: const TextStyle(
+                      fontSize: 16,
+                      color: Colors.blue,
+                      decoration: TextDecoration.underline,
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 20),
+                if (utilities.isNotEmpty) ...[
+                  const Text(
+                    'Tiện ích:',
+                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                  ),
+                  const SizedBox(height: 10),
+                  ListView.builder(
+                    shrinkWrap: true,
+                    physics: const NeverScrollableScrollPhysics(),
+                    itemCount: utilities.length,
+                    itemBuilder: (context, index) {
+                      final utility = utilities[index];
+                      return Container(
+                        margin: const EdgeInsets.symmetric(vertical: 4.0),
+                        padding: const EdgeInsets.all(8.0),
+                        decoration: BoxDecoration(
+                          color: Colors.grey.shade200,
+                          borderRadius: BorderRadius.circular(8.0),
+                          border: Border.all(color: Colors.grey.shade400),
+                        ),
+                        child: Text(
+                          utility.utilityName,
+                          style: const TextStyle(fontSize: 16),
+                        ),
+                      );
+                    },
+                  ),
+                  const SizedBox(height: 20),
+                ],
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                  children: [
+                    ActionButton(
+                      icon: Icons.calendar_today,
+                      onPressed: () {},
+                    ),
+                    ActionButton(
+                      icon: Icons.chat,
+                      onPressed: () async {
+                        final conversationController =
+                        Provider.of<Conversationcontroller>(context, listen: false);
+                        final userController =
+                        Provider.of<Usercontroller>(context, listen: false);
 
-                          Conversation? conversation =
-                              conversationController.conversations.firstWhere(
-                                  (conv) =>
-                                      conv.user2.id ==
-                                          widget.rentalProperty.landlord.id ||
-                                      conv.user1.id ==
-                                          widget.rentalProperty.landlord.id,
-                                  orElse: () => Conversation(
-                                      conversationId: "",
-                                      user1: userController.user!,
-                                      user2: widget.rentalProperty.landlord));
+                        Conversation? conversation = conversationController.conversations
+                            .firstWhere(
+                              (conv) =>
+                          conv.user2.id == widget.rentalProperty.landlord.id ||
+                              conv.user1.id == widget.rentalProperty.landlord.id,
+                          orElse: () => Conversation(
+                            conversationId: "",
+                            user1: userController.user!,
+                            user2: widget.rentalProperty.landlord,
+                          ),
+                        );
 
-                          if (conversation.conversationId == "") {
-                            conversation = await conversationController
-                                .newConversation(Conversation(
-                                    conversationId: "",
-                                    user1: userController.user!,
-                                    user2: widget.rentalProperty.landlord));
-                          }
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => ChatScreen(
-                                conversation: conversation,
-                                conversationController: conversationController,
-                              ),
+                        if (conversation.conversationId == "") {
+                          conversation = await conversationController.newConversation(
+                            Conversation(
+                              conversationId: "",
+                              user1: userController.user!,
+                              user2: widget.rentalProperty.landlord,
                             ),
                           );
-                        },
-                      ),
-                      ActionButton(
-                        icon: Icons.phone,
-                        onPressed: () async {
-                          final Uri phoneUri = Uri(
-                              scheme: 'tel', path: widget.rentalProperty.landlord.sdt);
+                        }
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => ChatScreen(
+                              conversation: conversation,
+                              conversationController: conversationController,
+                            ),
+                          ),
+                        );
+                      },
+                    ),
+                    ActionButton(
+                      icon: Icons.phone,
+                      onPressed: () async {
+                        final Uri phoneUri = Uri(
+                          scheme: 'tel',
+                          path: widget.rentalProperty.landlord.sdt,
+                        );
 
-                          if (await canLaunchUrl(phoneUri)) {
-                            await launchUrl(phoneUri);
-                          } else {
-                            print('Could not launch $phoneUri');
-                          }
-                        },
-                      ),
-                      // Nút mở Google Maps
-                      ActionButton(
-                        icon: Icons.map,
-                        onPressed: () async {
-                          // final Uri mapUri = Uri(
-                          //   scheme: 'https',
-                          //   host: 'www.google.com',
-                          //   path: 'maps/search/?api=1&query=${rentalProperty.rentPrice},${rentalProperty.area}',
-                          // );
-                          //
-                          // if (await canLaunchUrl(mapUri)) {
-                          //   await launchUrl(mapUri);
-                          // } else {
-                          //   print('Could not launch $mapUri');
-                          //}
-                          Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) => RentalMapScreen()));
-                        },
-                      ),
-                    ],
-                  ),
+                        if (await canLaunchUrl(phoneUri)) {
+                          await launchUrl(phoneUri);
+                        } else {
+                          print('Could not launch $phoneUri');
+                        }
+                      },
+                    ),
+                    ActionButton(
+                      icon: Icons.map,
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => RentalMapScreen(),
+                          ),
+                        );
+                      },
+                    ),
+                  ],
                 ),
               ],
             ),
@@ -178,9 +222,11 @@ class ActionButton extends StatelessWidget {
       style: ElevatedButton.styleFrom(
         backgroundColor: AppColors.mainColor,
         foregroundColor: Colors.white,
+        shape: const CircleBorder(),
+        padding: const EdgeInsets.all(16.0),
       ),
       onPressed: onPressed,
-      child: Icon(icon),
+      child: Icon(icon, size: 24),
     );
   }
 }

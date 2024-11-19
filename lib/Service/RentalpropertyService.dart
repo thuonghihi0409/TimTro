@@ -16,7 +16,6 @@ class Rentalpropertyservice {
         },
       );
       if (response.statusCode == 200) {
-        print("hihi ${json.decode(utf8.decode(response.bodyBytes))}");
         final List<dynamic> jsonResponse =
             json.decode(utf8.decode(response.bodyBytes));
         return jsonResponse
@@ -40,7 +39,6 @@ class Rentalpropertyservice {
         },
       );
       if (response.statusCode == 200) {
-        print("hihi ${json.decode(utf8.decode(response.bodyBytes))}");
         final List<dynamic> jsonResponse =
             json.decode(utf8.decode(response.bodyBytes));
         return jsonResponse
@@ -64,7 +62,6 @@ class Rentalpropertyservice {
         },
       );
       if (response.statusCode == 200) {
-        print("hihi kk ${json.decode(utf8.decode(response.bodyBytes))}");
         final List<dynamic> jsonResponse =
             json.decode(utf8.decode(response.bodyBytes));
         return jsonResponse
@@ -88,7 +85,6 @@ class Rentalpropertyservice {
         },
       );
       if (response.statusCode == 200) {
-        print("hihi kk ${json.decode(utf8.decode(response.bodyBytes))}");
         final List<dynamic> jsonResponse =
         json.decode(utf8.decode(response.bodyBytes));
         return jsonResponse
@@ -114,7 +110,6 @@ class Rentalpropertyservice {
         },
       );
       if (response.statusCode == 200) {
-        print("hihi${json.decode(utf8.decode(response.bodyBytes))}");
         final List<dynamic> jsonResponse =
             json.decode(utf8.decode(response.bodyBytes));
         return jsonResponse
@@ -129,11 +124,10 @@ class Rentalpropertyservice {
     }
   }
 
-  Future<bool> postRentalProperty(RentalProperty property) async {
+  Future<RentalProperty?> postRentalProperty(RentalProperty property) async {
     try {
       final url = Uri.parse("${API.link}/rentalproperty");
       print("==========================${jsonEncode(property.toJson())}");
-
       final response = await http.post(
         url,
         headers: {
@@ -143,9 +137,9 @@ class Rentalpropertyservice {
         body: jsonEncode(property.toJson()),
       );
 
-      if (response.statusCode == 201) {
+      if (response.statusCode == 201 || response.statusCode== 200) {
         print('Property posted successfully');
-        return true;
+        return RentalProperty.fromJson(jsonDecode(response.body));
       } else if (response.statusCode == 400) {
         print('Bad Request: ${response.body}');
       } else if (response.statusCode == 401) {
@@ -156,15 +150,16 @@ class Rentalpropertyservice {
         print(
             'Failed to post property: ${response.statusCode}, ${response.body}');
       }
-      return false;
+      return null;
     } catch (e) {
       print('Error posting property: $e');
-      return false;
+      return null;
     }
   }
 
   Future<bool> postUtilityOfRentalProperty(PropertyUtility pro) async {
     try {
+      print("ppppppppppppppppppppppppppppppppp${json.encode(pro.toJson())}");
       final url = Uri.parse("${API.link}/property-utilities");
       final response = await http.post(
         url,

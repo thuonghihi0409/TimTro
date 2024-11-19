@@ -20,6 +20,7 @@ class FindTab extends StatefulWidget {
 class _FindTabState extends State<FindTab> {
   String searchQuery = "";
   List<Utility> list = [];
+  bool isLoading = false; // Thêm biến để theo dõi trạng thái tải dữ liệu
 
   @override
   void initState() {
@@ -31,7 +32,15 @@ class _FindTabState extends State<FindTab> {
   }
 
   void _fetchUtilities() async {
+    setState(() {
+      isLoading = true; // Bắt đầu tải dữ liệu
+    });
+
     list = await context.read<Rentalpropertycontroller>().getUtilities();
+
+    setState(() {
+      isLoading = false; // Hoàn thành tải dữ liệu
+    });
   }
 
   @override
@@ -40,9 +49,10 @@ class _FindTabState extends State<FindTab> {
     print("Tong so phong tro =================  ${rentalpropertycontroller.listRental.length}");
     final filteredList = rentalpropertycontroller.listRental
         .where((property) => property.propertyName
-            .toLowerCase()
-            .contains(searchQuery.toLowerCase()))
+        .toLowerCase()
+        .contains(searchQuery.toLowerCase()))
         .toList();
+
     return SafeArea(
       child: Scaffold(
         body: Column(
@@ -62,13 +72,12 @@ class _FindTabState extends State<FindTab> {
                 SizedBox(
                   child: Container(
                     padding: const EdgeInsets.symmetric(horizontal: 5),
-                    // Thêm padding nhỏ để gọn hơn
                     decoration: BoxDecoration(
                       color: Colors.white,
                       border: Border.all(color: Colors.grey.shade300),
                       borderRadius: BorderRadius.circular(8),
                     ),
-                    child: DropdownMenu<String>(
+                    child: DropdownMenu<String>( // Dropdown cho utilities
                       initialSelection: "",
                       dropdownMenuEntries: [
                         DropdownMenuEntry<String>(
@@ -78,10 +87,10 @@ class _FindTabState extends State<FindTab> {
                         ...list
                             .map(
                               (toElement) => DropdownMenuEntry<String>(
-                                value: toElement.utilityId,
-                                label: toElement.utilityName,
-                              ),
-                            )
+                            value: toElement.utilityId,
+                            label: toElement.utilityName,
+                          ),
+                        )
                             .toList(),
                       ],
                       textStyle: const TextStyle(
@@ -90,9 +99,8 @@ class _FindTabState extends State<FindTab> {
                       ),
                       menuStyle: MenuStyle(
                         minimumSize: MaterialStateProperty.all(
-                            const Size(50, 100)), // Giới hạn kích thước menu
-                        visualDensity:
-                            VisualDensity.compact, // Giảm mật độ hiển thị
+                            const Size(50, 100)),
+                        visualDensity: VisualDensity.compact,
                       ),
                       onSelected: (String? value) {
                         rentalpropertycontroller.setSelect(value);
@@ -105,13 +113,14 @@ class _FindTabState extends State<FindTab> {
               ],
             ),
             Expanded(
-              child: ListView.builder(
+              child: isLoading // Kiểm tra trạng thái tải dữ liệu
+                  ? Center(child: CircularProgressIndicator()) // Hiển thị loading khi isLoading là true
+                  : ListView.builder(
                 physics: AlwaysScrollableScrollPhysics(),
                 itemCount: filteredList.length,
                 itemBuilder: (context, index) {
-                  final toElement =
-                      filteredList[index]; // Lấy phần tử dựa trên index
-                  return Item(rentalProperty: toElement); // Trả về widget Item
+                  final toElement = filteredList[index];
+                  return Item(rentalProperty: toElement);
                 },
               ),
             ),
@@ -121,6 +130,7 @@ class _FindTabState extends State<FindTab> {
     );
   }
 }
+
 
 class Item extends StatefulWidget {
   final RentalProperty rentalProperty;

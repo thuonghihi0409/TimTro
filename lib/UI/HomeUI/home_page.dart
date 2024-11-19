@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:timtro/Controller/UserController.dart';
+import 'package:timtro/UI/AccountUI/RegisterPage.dart';
 import 'package:timtro/UI/AccountUI/account_tab.dart';
 import 'package:timtro/UI/ChatUI/chat_tab.dart';
 import 'package:timtro/UI/RentalpropertyUI/find_tab.dart';
@@ -45,7 +46,7 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
 
     final usercontroler = context.watch<Usercontroller>();
-    final chatTab = usercontroler.state == 0 ? ChatTab() : ConversationsScreen();
+    final chatTab = usercontroler.state == 0 ? RegisterPage() : ConversationsScreen();
     final accountTab = usercontroler.state == 0 ? AccountTab1() : AccountTab2();
     final List<Widget> _tabs = [
       HomeTab(tabController: controller),
