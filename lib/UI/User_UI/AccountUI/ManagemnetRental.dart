@@ -4,7 +4,7 @@ import 'package:provider/provider.dart';
 import 'package:timtro/Controller/RentalPropertyController.dart';
 import 'package:timtro/Controller/UserController.dart';
 import 'package:timtro/Model/RentelProperty.dart';
-import 'package:timtro/UI/RentalpropertyUI/room_detail_page.dart';
+import 'package:timtro/UI/User_UI/RentalpropertyUI/room_detail_page.dart';
 import 'package:timtro/utils/colors.dart';
 import 'package:timtro/widgets/big_text.dart';
 import 'package:timtro/widgets/icon_and_text_widget.dart';
@@ -154,9 +154,16 @@ class _MyRentalState extends State<MyRental> {
                       SmallText(
                           text: "Giá: ${formatter.format(rentPrice)} VNĐ"),
                       SizedBox(height: 2),
-                      SmallText(
-                          text:
-                          "Số phòng còn: ${listRental[index].availableRooms}"),
+                      Row(
+                        children: [
+                          SmallText(
+                              text:
+                              "Số phòng còn: ${listRental[index].availableRooms}"),
+                          SmallText(
+                              text:
+                              "Lượt xem : ${listRental[index].numberViewer}"),
+                        ],
+                      ),
                       SizedBox(height: 2),
                       SmallText(
                           text:
@@ -212,6 +219,7 @@ class _MyRentalState extends State<MyRental> {
         .deleteRental(listRental[index].propertyId);
     setState(() {
       listRental.removeAt(index);
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Đã xóa trọ thành công")));
     });
   }
 

@@ -23,6 +23,11 @@ class Rentalpropertycontroller with ChangeNotifier{
     uploadUI();
   }
 
+  Future<List<RentalProperty>> getTopRental () async {
+     return await rentalPropertyservice.fetchTopRentalProperties();
+  }
+
+
   Future<void> postRental(RentalProperty rental, List<Utility> list) async {
     // Tạo Completer để quản lý quá trình chờ đợi
     Completer<RentalProperty> completer = Completer<RentalProperty>();
@@ -58,10 +63,9 @@ class Rentalpropertycontroller with ChangeNotifier{
           print("Utility ${utility.utilityName} đã được lưu thành công");
         } else {
           print("Không thể lưu Utility ${utility.utilityName}");
-          return; // Nếu gặp lỗi thì dừng lại
+           // Nếu gặp lỗi thì dừng lại
         }
       }
-
       // Sau khi hoàn thành, cập nhật giao diện
       uploadUI();
 
@@ -69,7 +73,9 @@ class Rentalpropertycontroller with ChangeNotifier{
       print("Lỗi xảy ra: $e");
     }
   }
-
+Future<void> updateRental(RentalProperty rental) async {
+    await rentalPropertyservice.updateRentalProperty(rental);
+}
 
   Future<List<RentalProperty>> getRentalByLandLord (String id) async{
     uploadUI();

@@ -3,13 +3,15 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:timtro/Controller/RentalPropertyController.dart';
 import 'package:timtro/Model/RentelProperty.dart';
-import 'package:timtro/UI/RentalpropertyUI/room_detail_page.dart';
+import 'package:timtro/Model/Utility.dart';
+import 'package:timtro/UI/User_UI/RentalpropertyUI/room_detail_page.dart';
+
 import 'package:timtro/utils/colors.dart';
 import 'package:timtro/widgets/big_text.dart';
+import 'package:timtro/widgets/icon_and_text_widget.dart';
+import 'package:timtro/widgets/search.dart';
 import 'package:timtro/widgets/small_text.dart';
-import '../../Model/Utility.dart';
-import '../../widgets/icon_and_text_widget.dart';
-import '../../widgets/search.dart';
+
 import 'package:intl/intl.dart'; // Thêm dòng này
 
 class FindTab extends StatefulWidget {
@@ -197,9 +199,16 @@ class _ItemState extends State<Item> {
                           text: "Giá: ${formatter.format(rentPrice)} VNĐ"),
                       // Sử dụng formatter
                       SizedBox(height: 5),
-                      SmallText(
-                          text:
-                              "Số phòng còn: ${widget.rentalProperty.availableRooms}"),
+                      Row(
+                        children: [
+                          SmallText(
+                              text:
+                                  "Số phòng còn: ${widget.rentalProperty.availableRooms}"),
+                          SmallText(
+                              text:
+                              "Lượt xem : ${widget.rentalProperty.numberViewer}"),
+                        ],
+                      ),
                       SizedBox(height: 5),
                       SmallText(
                           text:

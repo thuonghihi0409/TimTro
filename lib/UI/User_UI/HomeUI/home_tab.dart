@@ -1,11 +1,8 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:timtro/UI/HomeUI/home_tab_body.dart';
+import 'package:timtro/UI/User_UI/HomeUI/home_tab_body.dart';
+import 'package:timtro/widgets/search.dart';
 
-import '../../utils/colors.dart';
-import '../../widgets/big_text.dart';
-import '../../widgets/small_text.dart';
-import '../../widgets/search.dart';
 
 class HomeTab extends StatelessWidget {
   final CupertinoTabController tabController;

@@ -42,6 +42,19 @@ class Userservice{
     return response.statusCode;
   }
 
+  Future<int> updateUserToAPI(User user) async {
+    //print("${customer.toJson()}");
+    // Gọi API để lưu dữ liệu
+    final response = await http.put(
+      Uri.parse('${API.link}/users/userid=${user.id}'),
+      headers: <String, String>{
+        'Content-Type': 'application/json; charset=UTF-8',
+      },
+      body: jsonEncode(user.toJson()),
+    );
+    return response.statusCode;
+  }
+
   Future<void> saveUsername(String username) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     await prefs.setString('username', username);

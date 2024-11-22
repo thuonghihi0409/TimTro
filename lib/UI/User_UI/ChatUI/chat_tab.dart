@@ -5,7 +5,8 @@ import 'package:timtro/Controller/ConversationController.dart';
 import 'package:timtro/Controller/MessageController.dart';
 import 'package:timtro/Controller/UserController.dart';
 import 'package:timtro/Model/Conversation.dart';
-import 'package:timtro/UI/ChatUI/chat_view_tab.dart';
+import 'package:timtro/UI/User_UI/ChatUI/chat_view_tab.dart';
+
 import 'package:timtro/utils/colors.dart';
 
 class ConversationsScreen extends StatefulWidget {
@@ -59,6 +60,9 @@ class _ConversationsScreenState extends State<ConversationsScreen> {
   Widget build(BuildContext context) {
     final userController = context.watch<Usercontroller>();
     final conversationController1 = context.watch<Conversationcontroller>();
+
+
+
 
     return SafeArea(
       child: Scaffold(
@@ -183,6 +187,7 @@ class _ConversationsScreenState extends State<ConversationsScreen> {
               onTap: () {
                 Navigator.of(context).pop();
                 _showDeleteMessageDialog(context, conversations, index);
+
               },
             ),
             ListTile(

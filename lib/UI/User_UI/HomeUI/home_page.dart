@@ -2,13 +2,14 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:timtro/Controller/UserController.dart';
-import 'package:timtro/UI/AccountUI/RegisterPage.dart';
-import 'package:timtro/UI/AccountUI/account_tab.dart';
-import 'package:timtro/UI/ChatUI/chat_tab.dart';
-import 'package:timtro/UI/RentalpropertyUI/find_tab.dart';
-import 'package:timtro/UI/HomeUI/home_tab.dart';
+import 'package:timtro/UI/User_UI/AccountUI/RegisterPage.dart';
+import 'package:timtro/UI/User_UI/AccountUI/account_tab.dart';
+import 'package:timtro/UI/User_UI/ChatUI/chat_tab.dart';
+import 'package:timtro/UI/User_UI/HomeUI/home_tab.dart';
+import 'package:timtro/UI/User_UI/RentalpropertyUI/find_tab.dart';
+
 import 'package:timtro/utils/colors.dart';
-import 'package:timtro/UI/AccountUI/info_customer.dart';
+
 class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
@@ -63,12 +64,12 @@ class _HomePageState extends State<HomePage> {
             inactiveColor: Colors.grey,
             // backgroundColor: Colors.amberAccent,
             items: const [
-              BottomNavigationBarItem(icon: Icon(Icons.home), label: "Home"),
+              BottomNavigationBarItem(icon: Icon(Icons.home), label: "Trang Chủ"),
               BottomNavigationBarItem(
-                  icon: Icon(Icons.chat), label: "Chat"),
+                  icon: Icon(Icons.chat), label: "Trò Chuyện"),
               BottomNavigationBarItem(
-                  icon: Icon(Icons.find_in_page_outlined), label: "Find"),
-              BottomNavigationBarItem(icon: Icon(Icons.person), label: "Account"),
+                  icon: Icon(Icons.find_in_page_outlined), label: "Tìm Trọ"),
+              BottomNavigationBarItem(icon: Icon(Icons.person), label: "Tài Khoản"),
 
             ],
           ),

@@ -115,9 +115,15 @@ class LandlordProfilePage extends StatelessWidget {
             Center(
               child: CircleAvatar(
                 radius: 70,
-                backgroundImage: NetworkImage(landlord.avturl),
+                backgroundImage: landlord.avturl != null && landlord.avturl.isNotEmpty
+                    ? NetworkImage(landlord.avturl)
+                    : null,
+                child: landlord.avturl == null || landlord.avturl.isEmpty
+                    ? Icon(Icons.person, size: 70)
+                    : null,
               ),
             ),
+
             const SizedBox(height: 16),
             // Tên chủ trọ
             Center(

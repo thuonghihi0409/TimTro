@@ -98,6 +98,8 @@ class RoomDetailWidget extends StatelessWidget {
         Text('Giá: ${rentalProperty.rentPrice}', style: TextStyle(fontSize: 18)),
         Text(rentalProperty.address),
         Text('Diện tích: ${rentalProperty.area} m²'),
+        Text("Số phòng còn: ${rentalProperty.availableRooms}"),
+        Text("Số lượt xem: ${rentalProperty.numberViewer}"),
         SizedBox(height: 20),
         // Bảng giá từ thuộc tính riêng của phòng
         Table(

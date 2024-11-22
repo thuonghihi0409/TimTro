@@ -30,6 +30,29 @@ class Rentalpropertyservice {
     }
   }
 
+  Future<List<RentalProperty>> fetchTopRentalProperties() async {
+    try {
+      final response = await http.get(
+        Uri.parse("${API.link}/rentalproperty/gettoprentalproperty"),
+        headers: {
+          'Content-Type': 'application/json; charset=UTF-8',
+        },
+      );
+      if (response.statusCode == 200) {
+        final List<dynamic> jsonResponse =
+        json.decode(utf8.decode(response.bodyBytes));
+        return jsonResponse
+            .map((property) => RentalProperty.fromJson(property))
+            .toList();
+      } else {
+        throw Exception('Failed to load top rental properties');
+      }
+    } catch (e) {
+      print('Error fetching top rental properties: $e');
+      return [];
+    }
+  }
+
   Future<List<RentalProperty>> getRentalByLandLord(String id) async {
     try {
       final response = await http.get(
@@ -156,6 +179,40 @@ class Rentalpropertyservice {
       return null;
     }
   }
+
+  Future<RentalProperty?> updateRentalProperty(RentalProperty property) async {
+    try {
+      final url = Uri.parse("${API.link}/rentalproperty/rentalpropertyid=${property.propertyId}");
+      print("==========================${jsonEncode(property.toJson())}");
+      final response = await http.put(
+        url,
+        headers: {
+          'Content-Type': 'application/json; charset=UTF-8',
+          // Đảm bảo thêm charset
+        },
+        body: jsonEncode(property.toJson()),
+      );
+
+      if (response.statusCode == 201 || response.statusCode== 200) {
+        print('Property update successfully');
+        return RentalProperty.fromJson(jsonDecode(response.body));
+      } else if (response.statusCode == 400) {
+        print('Bad Request: ${response.body}');
+      } else if (response.statusCode == 401) {
+        print('Unauthorized: Please check your credentials');
+      } else if (response.statusCode == 500) {
+        print('Server Error: Please try again later');
+      } else {
+        print(
+            'Failed to update property: ${response.statusCode}, ${response.body}');
+      }
+      return null;
+    } catch (e) {
+      print('Error updating property: $e');
+      return null;
+    }
+  }
+
 
   Future<bool> postUtilityOfRentalProperty(PropertyUtility pro) async {
     try {

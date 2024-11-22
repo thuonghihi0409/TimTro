@@ -2,11 +2,14 @@ import 'dart:convert';
 import 'dart:io';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/widgets.dart';
+import 'package:geocoding/geocoding.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:provider/provider.dart';
 import 'package:timtro/Controller/RentalPropertyController.dart';
 import 'package:timtro/Controller/UserController.dart';
 import 'package:timtro/Model/RentelProperty.dart';
 import 'package:timtro/Model/Utility.dart';
+import 'package:timtro/Service/Mapservice.dart';
 import 'package:uuid/uuid.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
@@ -40,13 +43,17 @@ class _UploadRentalPropertyScreenState
   List<XFile> _imageFiles = [];
   final ImagePicker _picker = ImagePicker();
   LatLng _selectedLocation = LatLng(10.8231, 106.6297);
-
+  String _locationMessage="";
+  String? urlmap;
   @override
   void initState() {
     super.initState();
     _fetchUtilities();
     isChecked = List<bool>.filled(listUtilities.length, false);
+    _addressController.text=_locationMessage;
   }
+
+
 
   Future<void> _pickMultipleImages() async {
     final pickedFiles = await _picker.pickMultiImage();
@@ -87,7 +94,8 @@ class _UploadRentalPropertyScreenState
   Future<void> _handlePostRental() async {
     if (_formKey.currentState!.validate()) {
       setState(() {
-        isUploading = true; // Hiển thị loading khi bắt đầu đăng
+        isUploading = true;
+        // Hiển thị loading khi bắt đầu đăng
       });
 
       await _uploadImages();
@@ -108,16 +116,18 @@ class _UploadRentalPropertyScreenState
         electricPrice: _electricityPriceController.text,
         postDate: DateTime.now(),
         updateDate: DateTime.now(),
+        urlmap: urlmap ?? "",
+        numberViewer: 0,
         landlord: context.read<Usercontroller>().user!,
-        status: 0,
+        status: 1,
       );
-
+      print("so tien ich ==============  ${listUtilitiesOfRental.length}");
       await context
           .read<Rentalpropertycontroller>()
           .postRental(rentalProperty, listUtilitiesOfRental);
-
       setState(() {
         isUploading = false;
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Đã đăng trọ thành công")));
       });
 
       Navigator.pop(context);
@@ -144,9 +154,6 @@ class _UploadRentalPropertyScreenState
                   _buildTextField(
                       _nameController, 'Tên trọ', 'Vui lòng nhập tên trọ',
                       icon: Icons.home),
-                  _buildTextField(
-                      _addressController, 'Địa chỉ', 'Vui lòng nhập địa chỉ',
-                      icon: Icons.location_on),
                   _buildTextField(_priceController, 'Giá trọ (VNĐ)',
                       'Vui lòng nhập giá trọ',
                       isNumber: true, icon: Icons.money),
@@ -165,6 +172,22 @@ class _UploadRentalPropertyScreenState
                   _buildTextField(_descriptionController, 'Mô tả', '',
                       icon: Icons.description),
                   const SizedBox(height: 16),
+                  _buildTextField(
+                      _addressController, 'Địa chỉ', 'Vui lòng nhập địa chỉ',
+                      icon: Icons.location_on),
+                  SizedBox(height: 20),
+                  ElevatedButton(
+                      onPressed: () async {
+                        Mapservice mapservice = Mapservice();
+                        String tepm= await mapservice.getCurrentLocation();
+                        urlmap=  await mapservice.getGoogleMapsLink();
+                       setState(() {
+                         _locationMessage= tepm;
+                         _addressController.text=_locationMessage;
+
+                       });
+                      },
+                      child: Center(child: Text("Lấy vị trí hiện tại"))),
                   Text('Tiện ích:'),
                   ...listUtilities.asMap().entries.map((entry) {
                     return CheckboxListTile(

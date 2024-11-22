@@ -6,12 +6,13 @@ import 'package:timtro/Controller/UserController.dart';
 import 'package:timtro/Model/Conversation.dart';
 import 'package:timtro/Model/RentelProperty.dart';
 import 'package:timtro/Model/Utility.dart';
-import 'package:timtro/UI/AccountUI/personal_acount_view.dart';
-import 'package:timtro/UI/RentalpropertyUI/MapScreen.dart';
-import 'package:timtro/UI/ChatUI/chat_view_tab.dart';
+import 'package:timtro/UI/User_UI/AccountUI/personal_acount_view.dart';
+import 'package:timtro/UI/User_UI/ChatUI/chat_view_tab.dart';
+import 'package:timtro/utils/colors.dart';
+import 'package:timtro/widgets/room_detail_widget.dart';
+
 import 'package:url_launcher/url_launcher.dart';
-import '../../utils/colors.dart';
-import '../../widgets/room_detail_widget.dart';
+
  // Import trang cá nhân của chủ trọ
 
 class RoomDetailPage extends StatefulWidget {
@@ -30,9 +31,16 @@ class _RoomDetailPageState extends State<RoomDetailPage> {
   @override
   void initState() {
     super.initState();
+    if(widget.rentalProperty.status==0){
+      widget.rentalProperty.numberViewer+=1;
+    }
     loadUtility();
+    updateRental();
   }
-
+  void updateRental() async {
+    print(" So luot xem = ${widget.rentalProperty.numberViewer}");
+    await context.read<Rentalpropertycontroller>().updateRental(widget.rentalProperty);
+  }
   void loadUtility() async {
     final rentalPropertyController = context.read<Rentalpropertycontroller>();
     utilities = await rentalPropertyController.getUtilitiesByRental(widget.rentalProperty.propertyId);
@@ -136,7 +144,6 @@ class _RoomDetailPageState extends State<RoomDetailPage> {
                         Provider.of<Conversationcontroller>(context, listen: false);
                         final userController =
                         Provider.of<Usercontroller>(context, listen: false);
-
                         Conversation? conversation = conversationController.conversations
                             .firstWhere(
                               (conv) =>
@@ -186,13 +193,14 @@ class _RoomDetailPageState extends State<RoomDetailPage> {
                     ),
                     ActionButton(
                       icon: Icons.map,
-                      onPressed: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => RentalMapScreen(),
-                          ),
-                        );
+                      onPressed: () async {
+                        if (await canLaunchUrl(Uri.parse(widget.rentalProperty.urlmap))) {
+                         await launchUrl(Uri.parse(widget.rentalProperty.urlmap));
+                        } else {
+                          setState(() {
+                            ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Chủ trọ chưa cập nhật vị trí !!!")));
+                          });
+                        }
                       },
                     ),
                   ],

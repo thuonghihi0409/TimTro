@@ -9,7 +9,9 @@ class Usercontroller with ChangeNotifier {
   int state = 0;
 
   Userservice userservice = Userservice();
-
+void loadUI(){
+  notifyListeners();
+}
   // void setUser(String id) async {
   //
   //   user = await userservice.fetchUser(id);
@@ -54,6 +56,10 @@ class Usercontroller with ChangeNotifier {
     );
     notifyListeners();
     return t;
+  }
+
+  Future<int> updateUser(User user) async {
+     return await userservice.updateUserToAPI(user);
   }
 
   Future<void> login(User user1) async {

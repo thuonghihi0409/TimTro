@@ -3,18 +3,16 @@ import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:timtro/Controller/RentalPropertyController.dart';
 import 'package:timtro/Controller/UserController.dart';
-import 'package:timtro/UI/AccountUI/LoginPage.dart';
-import 'package:timtro/UI/AccountUI/ManagemnetRental.dart';
-import 'package:timtro/UI/RentalpropertyUI/UploadImage.dart';
-import 'package:timtro/UI/RentalpropertyUI/find_tab.dart';
-import 'package:timtro/UI/AccountUI/info_customer.dart';
-import 'package:timtro/UI/RentalpropertyUI/room_detail_page.dart';
-import 'package:timtro/UI/RentalpropertyUI/upRentalpropertyscreen.dart';
+import 'package:timtro/UI/User_UI/AccountUI/LoginPage.dart';
+import 'package:timtro/UI/User_UI/AccountUI/ManagemnetRental.dart';
+import 'package:timtro/UI/User_UI/AccountUI/info_customer.dart';
+import 'package:timtro/UI/User_UI/RentalpropertyUI/upRentalpropertyscreen.dart';
+
 import 'package:timtro/utils/colors.dart';
 import 'package:timtro/widgets/big_text.dart';
 import 'package:timtro/widgets/icon_and_text_widget.dart';
 import 'package:timtro/widgets/small_text.dart';
-import '../../Model/RentelProperty.dart';
+
 import 'RegisterPage.dart';
 
 class AccountTab1 extends StatelessWidget {
@@ -214,7 +212,7 @@ class _AccountTab2State extends State<AccountTab2> {
                     onTap: () => Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (context) => CustomerInfoPage(),
+                        builder: (context) => CustomerInfoPage(usercontroller: usercontroller,),
                       ),
                     ),
                   ),
