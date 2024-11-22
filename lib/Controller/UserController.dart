@@ -70,4 +70,34 @@ void loadUI(){
       await userservice.saveUsername(user!.username);
     }
   }
+
+  List<User> users = []; // Danh sách người dùng với kiểu User
+
+
+  Future<void> loadAllUsers() async {
+    try {
+      users = await userservice.fetchAllUsers();
+      debugPrint("Loaded ${users.length} users successfully.");
+      notifyListeners();
+    } catch (error) {
+      debugPrint("Error loading users: $error");
+      // Bạn cũng có thể thông báo lỗi qua giao diện nếu cần.
+    }
+  }
+
+  Future<void> deleteUser(String userId) async {
+    try {
+      bool isDeleted = await userservice.deleteUser(userId); // Gọi service xóa
+      if (isDeleted) {
+        users.removeWhere((user) => user.id == userId); // Xóa khỏi danh sách
+        notifyListeners();
+        debugPrint("Deleted user with ID: $userId");
+      } else {
+        debugPrint("Failed to delete user with ID: $userId");
+      }
+    } catch (error) {
+      debugPrint("Error deleting user: $error");
+      // Bạn có thể hiển thị thông báo lỗi trong UI nếu cần.
+    }
+  }
 }

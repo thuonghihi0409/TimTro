@@ -155,6 +155,7 @@ class _MyRentalState extends State<MyRental> {
                           text: "Giá: ${formatter.format(rentPrice)} VNĐ"),
                       SizedBox(height: 2),
                       Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           SmallText(
                               text:

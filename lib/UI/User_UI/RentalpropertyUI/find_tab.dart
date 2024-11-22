@@ -200,6 +200,7 @@ class _ItemState extends State<Item> {
                       // Sử dụng formatter
                       SizedBox(height: 5),
                       Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           SmallText(
                               text:

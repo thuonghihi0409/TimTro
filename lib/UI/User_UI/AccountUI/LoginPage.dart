@@ -2,9 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:timtro/Controller/UserController.dart';
 import 'package:timtro/Model/User.dart';
+import 'package:timtro/UI/User_UI/AccountUI/RegisterPage.dart';
+import 'package:timtro/UI/User_UI/HomeUI/home_page.dart';
 
 import 'package:timtro/utils/colors.dart';
-
 
 class LoginPage extends StatefulWidget {
   @override
@@ -33,7 +34,7 @@ class _LoginPageState extends State<LoginPage> {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Text(
-                  "Tìm Tro",
+                  "Tìm Trọ",
                   style: TextStyle(
                     fontSize: 30,
                     fontWeight: FontWeight.bold,
@@ -44,7 +45,7 @@ class _LoginPageState extends State<LoginPage> {
                 TextFormField(
                   controller: _usernameController,
                   decoration: InputDecoration(
-                    labelText: 'Username',
+                    labelText: 'Tên đăng nhập',
                     border: OutlineInputBorder(),
                   ),
                   // keyboardType: TextInputType.phone,
@@ -63,8 +64,8 @@ class _LoginPageState extends State<LoginPage> {
                   decoration: InputDecoration(
                     labelText: 'Mật khẩu',
                     border: OutlineInputBorder(),
-                    suffixIcon: Icon(
-                        Icons.visibility_off), // Icon để ẩn hiện mật khẩu
+                    suffixIcon:
+                        Icon(Icons.visibility_off), // Icon để ẩn hiện mật khẩu
                   ),
                   obscureText: true,
                   validator: (value) {
@@ -77,7 +78,8 @@ class _LoginPageState extends State<LoginPage> {
                 SizedBox(height: 10),
                 ElevatedButton(
                   onPressed: () {
-                    User user = User(id: " ",
+                    User user = User(
+                        id: " ",
                         username: _usernameController.text,
                         password: _passwordController.text,
                         name: " ",
@@ -85,10 +87,14 @@ class _LoginPageState extends State<LoginPage> {
                         gmail: " ",
                         vaitro: " ",
                         ngaytao: DateTime.now(),
-                        avturl: " "
-                    );
+                        avturl: " ");
                     usercontroler.login(user);
-                    Navigator.pop(context);
+                    Navigator.of(context).pop();
+
+                    // Navigator.pushReplacement(
+                    //   context,
+                    //   MaterialPageRoute(builder: (context) => HomePage()),
+                    // );
                   },
                   child: Text('Đăng nhập'),
                   style: ElevatedButton.styleFrom(
@@ -99,18 +105,18 @@ class _LoginPageState extends State<LoginPage> {
                   ),
                 ),
                 SizedBox(height: 10),
-                // TextButton(
-                //   onPressed: () {
-                //     // Điều hướng đến trang đăng ký
-                //     Navigator.push(
-                //       context,
-                //       MaterialPageRoute(
-                //         builder: (context) => RegisterPage(),
-                //       ),
-                //     );
-                //   },
-                //   child: Text('Bạn chưa có tài khoản? Đăng ký'),
-                // ),
+                TextButton(
+                  onPressed: () {
+                    // Điều hướng đến trang đăng ký
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => RegisterPage(),
+                      ),
+                    );
+                  },
+                  child: Text('Bạn chưa có tài khoản? Đăng ký'),
+                ),
               ],
             ),
           ),

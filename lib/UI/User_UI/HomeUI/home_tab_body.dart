@@ -51,6 +51,7 @@ class _HomePageBodyState extends State<HomeTabBody> {
 
   @override
   void dispose() {
+    super.dispose();
     pageController.dispose();
   }
 

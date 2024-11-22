@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:timtro/Controller/UserController.dart';
 import 'package:timtro/Model/Customer.dart';
+import 'package:timtro/UI/User_UI/AccountUI/LoginPage.dart';
+import 'package:timtro/UI/User_UI/HomeUI/home_page.dart';
 import 'package:timtro/utils/colors.dart';
 
 class RegisterPage extends StatefulWidget {
@@ -37,7 +39,7 @@ class _RegisterPageState extends State<RegisterPage> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Text(
-                    "Tìm Tro",
+                    "Tìm Trọ",
                     style: TextStyle(
                       fontSize: 30,
                       fontWeight: FontWeight.bold,
@@ -91,6 +93,7 @@ class _RegisterPageState extends State<RegisterPage> {
                       return null;
                     },
                   ),
+                  SizedBox(height: 10),
                   TextFormField(
                     controller: _emailController,
                     decoration: InputDecoration(
@@ -138,9 +141,7 @@ class _RegisterPageState extends State<RegisterPage> {
                   SizedBox(height: 20),
                   ElevatedButton(
                     onPressed: () {
-          
-                      //       if (_formKey.currentState!.validate())
-                      if (true) {
+                      if (_formKey.currentState!.validate()) {
                         // Lấy dữ liệu từ form và tạo đối tượng Customer
                         Customer newCustomer = Customer(
                           id: DateTime.now().toString(), // Hoặc cách lấy ID khác
@@ -158,14 +159,16 @@ class _RegisterPageState extends State<RegisterPage> {
                         // Lưu Customer vào API (hàm này bạn sẽ phải tự xây dựng)
 
                         usercontroler.createCustomer(newCustomer);
+                        // Hiển thị SnackBar thông báo
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(content: Text('Đang xử lý đăng ký...')),
+                        );
                         usercontroler.setstate(1);
-          
+
                         Navigator.pop(context);
-          
-                        // // Hiển thị SnackBar thông báo
-                        // ScaffoldMessenger.of(context).showSnackBar(
-                        //   SnackBar(content: Text('Đang xử lý đăng ký...')),
-                        // );
+                        Navigator.push(context, MaterialPageRoute(builder: (context)=>HomePage()));
+
+
                       }
                     },
                     child: Text('Đăng ký'),
@@ -175,6 +178,19 @@ class _RegisterPageState extends State<RegisterPage> {
                       padding: EdgeInsets.symmetric(vertical: 15, horizontal: 30),
                       textStyle: TextStyle(fontSize: 16),
                     ),
+                  ),
+                  SizedBox(height: 10),
+                  TextButton(
+                    onPressed: () {
+                      // Điều hướng đến trang đăng ký
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => LoginPage(),
+                        ),
+                      );
+                    },
+                    child: Text(' Bạn đã có tài khoản? Đăng nhập'),
                   ),
           
                 ],

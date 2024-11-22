@@ -96,4 +96,37 @@ class Userservice{
       return null;
     }
   }
+
+  Future<List<User>> fetchAllUsers() async {
+
+    final response = await http.get(
+      Uri.parse('${API.link}/users'),
+      headers: {'Content-Type': 'application/json; charset=UTF-8'},
+    );
+
+    if (response.statusCode == 200) {
+      // Decode và log response body
+      final String responseBody = utf8.decode(response.bodyBytes);
+      final List<dynamic> data = json.decode(responseBody);
+      List<User> users = data.map((userJson) => User.fromJson(userJson)).toList();
+      users = users.where((user) => user.vaitro.toLowerCase() != "admin").toList();
+      return users;
+    } else {
+      throw Exception("Failed to load users. Status code: ${response.statusCode}");
+    }
+
+  }
+
+
+  Future<bool> deleteUser(String userId) async {
+
+    final response = await http.delete(Uri.parse("${API.link}/users/userid=$userId"));
+
+    if (response.statusCode == 200) {
+      return true; // Xóa thành công
+    } else {
+
+      return false; // Xóa thất bại
+    }
+  }
 }

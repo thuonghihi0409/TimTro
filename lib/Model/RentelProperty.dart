@@ -98,4 +98,10 @@ class RentalProperty {
       "numberViewer": numberViewer,
     };
   }
+  double getNumericRentPrice() {
+    //print("Rent Price: $rentPrice"); // Kiểm tra giá trị rentPrice
+    String priceStr = rentPrice.replaceAll(RegExp(r'[^\d]'), ''); // Loại bỏ ký tự không phải số
+    // print("Cleaned Rent Price: $priceStr"); // Kiểm tra giá trị sau khi đã loại bỏ ký tự không phải số
+    return double.tryParse(priceStr) ?? 0.0;
+  }
 }

@@ -100,4 +100,78 @@ Future<void> updateRental(RentalProperty rental) async {
     await rentalPropertyservice.deleteRentalProperty(id);
     uploadUI();
   }
+
+  // Function to reject a rental property by setting its status to 0
+  Future<void> rejectRental(String propertyId) async {
+    bool success = await rentalPropertyservice.updateRentalStatus(propertyId, -1);
+    if (success) {
+      // Optionally, update the local list or UI after status change
+      uploadUI();
+    } else {
+      print("Failed to reject the rental property.");
+    }
+  }
+
+  // Function to approve a rental property (set status to 1)
+  Future<void> approveRental(String propertyId) async {
+    bool success = await rentalPropertyservice.updateRentalStatus(propertyId, 0);
+    if (success) {
+      // Optionally, update the local list or UI after status change
+      uploadUI();
+    } else {
+      print("Failed to approve the rental property.");
+    }
+  }
+
+
+  // Future<Map<int, int>> getRentalCountForYear(int year) async {
+  //   try {
+  //     // Tạo một Map để lưu dữ liệu với key là tháng, value là số lượng phòng
+  //     Map<int, int> rentalCountPerMonth = {};
+  //
+  //     for (int month = 1; month <= 12; month++) {
+  //       // Gọi hàm service để lấy danh sách phòng cho từng tháng
+  //       List<RentalProperty> rentals = await rentalPropertyservice.getRentalByMonthAndYear(month, year);
+  //
+  //       // Cập nhật số lượng phòng cho tháng tương ứng
+  //       rentalCountPerMonth[month] = rentals.length;
+  //     }
+  //
+  //     return rentalCountPerMonth;
+  //   } catch (e) {
+  //     print('Error fetching rental count for year: $e');
+  //     return {};
+  //   }
+  // }
+
+  Future<Map<int, int>> getRentalCountForYear(int year) async {
+    try {
+      // Map to store rental counts for each month
+      Map<int, int> rentalCountPerMonth = {};
+
+      // Loop over each month of the year
+      for (int month = 1; month <= 12; month++) {
+        // Fetch the rentals for the current month and year
+        List<RentalProperty> rentals = await rentalPropertyservice.getRentalByMonthAndYear(month, year);
+
+        // Filter rentals by status 0 (available) if needed
+        List<RentalProperty> availableRentals = rentals.where((rental) => rental.status == 0).toList();
+
+        // Update the map with the count of available rentals for the current month
+        rentalCountPerMonth[month] = availableRentals.length;
+      }
+
+      return rentalCountPerMonth;
+    } catch (e) {
+      print('Error fetching rental count for year: $e');
+      return {}; // Return an empty map if error occurs
+    }
+  }
+
+  Future<List> checkRental() async {
+    List a = await rentalPropertyservice.getRentalByStatus(1) as List;
+    print(a); // Debug the list here
+    uploadUI();
+    return a;
+  }
 }

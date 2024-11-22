@@ -281,4 +281,53 @@ class Rentalpropertyservice {
       return [];
     }
   }
+  Future<bool> updateRentalStatus(String rentalpropertyId, int status) async {
+    try {
+      // The URL should include both rentalpropertyId and status as path parameters
+      final url = Uri.parse('${API.link}/rentalproperty/rentalpropertyid=$rentalpropertyId/status/$status');
+
+      // Sending the PATCH request with appropriate headers
+      final response = await http.patch(
+        url,
+        headers: <String, String>{
+          'Content-Type': 'application/json; charset=UTF-8',
+        },
+      );
+
+      if (response.statusCode == 200) {
+        print("Rental status updated successfully");
+        return true; // Successfully updated the status
+      } else {
+        print('Failed to update rental status: ${response.statusCode}');
+        return false; // Failure
+      }
+    } catch (e) {
+      print('Error occurred while updating rental status: $e');
+      return false; // Error occurred
+    }
+  }
+
+  Future<List<RentalProperty>> getRentalByMonthAndYear(int month, int year) async {
+    try {
+      // Chuyển tháng và năm thành tham số truy vấn trong URL
+      final response = await http.get(
+        Uri.parse("${API.link}/rentalproperty/month=$month&year=$year"),
+        headers: {
+          'Content-Type': 'application/json; charset=UTF-8',
+        },
+      );
+      if (response.statusCode == 200) {
+        final List<dynamic> jsonResponse =
+        json.decode(utf8.decode(response.bodyBytes));
+        return jsonResponse
+            .map((property) => RentalProperty.fromJson(property))
+            .toList();
+      } else {
+        throw Exception('Failed to load rental properties');
+      }
+    } catch (e) {
+      print('Error fetching rental properties: $e');
+      return [];
+    }
+  }
 }
